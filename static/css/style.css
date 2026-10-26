@@ -1,0 +1,104 @@
+/* Shared page styles */
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6fa;
+    color: #243247;
+    margin: 0;
+    padding: 24px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+}
+
+a {
+    color: #2459a6;
+}
+
+h1 {
+    margin-bottom: 8px;
+}
+
+.subtitle,
+.case-number {
+    color: #637083;
+}
+
+.subtitle {
+    margin-bottom: 24px;
+}
+
+/* Case list */
+.table-wrapper {
+    background: white;
+    border-radius: 12px;
+    overflow-x: auto;
+    border: 1px solid #dfe5ee;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid #e8edf3;
+}
+
+th {
+    background: #eaf0f8;
+    white-space: nowrap;
+}
+
+.urgent {
+    color: #b42318;
+    font-weight: bold;
+}
+
+.empty {
+    text-align: center;
+    padding: 32px;
+}
+
+/* Case details */
+.detail-container {
+    max-width: 850px;
+    margin: auto;
+}
+
+.card {
+    background: white;
+    padding: 28px;
+    margin-top: 24px;
+    border: 1px solid #dfe5ee;
+    border-radius: 12px;
+}
+
+dt {
+    font-weight: bold;
+    margin-top: 18px;
+}
+
+dd {
+    margin: 6px 0 0;
+    overflow-wrap: anywhere;
+}
+
+.description {
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 16px;
+    }
+
+    .card {
+        padding: 20px;
+    }
+}
