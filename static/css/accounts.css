@@ -1,0 +1,423 @@
+
+/* ==========================================
+   FMSC Complaint & Suggestion Management
+   Accounts Module Styles
+   ========================================== */
+
+:root {
+    --primary: #2459a6;
+    --primary-dark: #1b447f;
+    --background: #f4f6fa;
+    --white: #ffffff;
+    --text: #243247;
+    --muted: #637083;
+    --border: #dfe5ee;
+    --soft-blue: #eaf0f8;
+    --shadow: 0 5px 20px rgba(36, 50, 71, 0.06);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--text);
+    background: var(--background);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* HEADER */
+
+.site-header {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 6%;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.brand {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.brand-name {
+    color: var(--primary);
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.brand-subtitle {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.university-name {
+    color: var(--muted);
+    font-size: 13px;
+    text-align: right;
+}
+
+/* AUTHENTICATION */
+
+.auth-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 45px 20px;
+}
+
+.auth-card {
+    background: var(--white);
+    width: 100%;
+    max-width: 440px;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+
+.register-card {
+    max-width: 480px;
+}
+
+.card-heading {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.eyebrow {
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.card-heading h1 {
+    color: var(--text);
+    font-size: 28px;
+    margin: 12px 0;
+}
+
+.card-heading p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* FORMS */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #b8c5d6;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--white);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(36, 89, 166, 0.10);
+}
+
+.form-help {
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.5;
+    margin-top: 6px;
+}
+
+.form-help ul {
+    padding-left: 18px;
+    margin: 7px 0;
+}
+
+.field-error {
+    color: #b42318;
+    font-size: 12px;
+    margin-top: 7px;
+}
+
+.field-error ul {
+    padding-left: 18px;
+}
+
+/* BUTTONS */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: var(--white);
+    width: 100%;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+}
+
+.btn-outline {
+    background: var(--primary);
+    color: var(--white);
+    padding: 9px 18px;
+}
+
+.btn-outline:hover {
+    background: var(--primary-dark);
+}
+
+/* LINKS AND MESSAGES */
+
+.auth-footer {
+    text-align: center;
+    font-size: 13px;
+    margin-top: 25px;
+    color: var(--muted);
+}
+
+.auth-footer a,
+.feature-link {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-footer a:hover,
+.feature-link:hover {
+    text-decoration: underline;
+}
+
+.alert {
+    background: #e9f7ef;
+    color: #17643b;
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+
+.alert-error {
+    background: #fff0f0;
+    color: #b42318;
+}
+
+/* DASHBOARD */
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-username {
+    color: var(--text);
+    font-size: 14px;
+}
+
+.dashboard-container {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 45px 25px 65px;
+    flex: 1;
+}
+
+.dashboard-heading {
+    margin-bottom: 30px;
+}
+
+.dashboard-heading h1 {
+    color: var(--text);
+    font-size: 30px;
+    margin: 12px 0;
+}
+
+.dashboard-heading p {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.dashboard-card {
+    background: var(--white);
+    padding: 30px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    margin-bottom: 35px;
+}
+
+.dashboard-card h2,
+.dashboard-section h2 {
+    font-size: 19px;
+    margin: 0 0 24px;
+}
+
+.profile-info {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.profile-item {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.info-label {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.profile-item strong {
+    font-size: 15px;
+}
+
+.role-badge {
+    color: var(--primary);
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}
+
+.feature-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 26px;
+    box-shadow: var(--shadow);
+}
+
+.feature-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: var(--soft-blue);
+    color: var(--primary);
+    border-radius: 10px;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.feature-card h3 {
+    font-size: 17px;
+    margin: 0 0 12px;
+}
+
+.feature-card p {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.7;
+    min-height: 45px;
+}
+
+.feature-link {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 13px;
+}
+
+.coming-soon {
+    display: inline-block;
+    color: var(--muted);
+    background: var(--soft-blue);
+    padding: 7px 11px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 12px;
+}
+
+/* FOOTER */
+
+.site-footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 20px;
+    border-top: 1px solid var(--border);
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .university-name {
+        text-align: center;
+    }
+
+    .auth-card {
+        padding: 28px 22px;
+    }
+
+    .profile-info,
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-heading h1 {
+        font-size: 25px;
+    }
+
+    .header-actions {
+        justify-content: center;
+    }
+}

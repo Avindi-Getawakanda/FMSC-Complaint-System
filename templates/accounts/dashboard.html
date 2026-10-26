@@ -1,0 +1,130 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | FMSC Feedback Portal</title>
+    <link rel="stylesheet" href="{% static 'css/accounts.css' %}">
+</head>
+<body class="dashboard-page">
+
+    <header class="site-header">
+        <div class="header-content">
+            <div class="brand">
+                <span class="brand-name">FMSC</span>
+                <span class="brand-subtitle">
+                    Complaint & Suggestion Management System
+                </span>
+            </div>
+
+            <div class="header-actions">
+                <span class="header-username">
+                    {{ request.user.username }}
+                </span>
+
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline">
+                        Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+
+        <div class="dashboard-heading">
+            <span class="eyebrow">YOUR PERSONAL DASHBOARD</span>
+            <h1>Welcome, {{ request.user.username }}!</h1>
+            <p>
+                Manage your feedback and stay informed
+                about its progress.
+            </p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <section class="dashboard-card">
+            <h2>Account Overview</h2>
+
+            <div class="profile-info">
+                <div class="profile-item">
+                    <span class="info-label">Username</span>
+                    <strong>{{ request.user.username }}</strong>
+                </div>
+
+                <div class="profile-item">
+                    <span class="info-label">Account Role</span>
+                    <strong class="role-badge">
+                        {{ profile.get_role_display }}
+                    </strong>
+                </div>
+
+                <div class="profile-item">
+                    <span class="info-label">Department</span>
+                    <strong>
+                        {{ profile.department|default:"Not specified" }}
+                    </strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="dashboard-section">
+            <h2>Quick Access</h2>
+
+            <div class="feature-grid">
+
+                <div class="feature-card">
+                    <div class="feature-icon">+</div>
+                    <h3>Submit a Case</h3>
+                    <p>
+                        Submit a complaint or suggestion
+                        to the faculty.
+                    </p>
+
+                    <a href="{% url 'submit_case' %}"
+                       class="feature-link">
+                        Submit Now
+                    </a>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">&#9776;</div>
+                    <h3>My Cases</h3>
+                    <p>
+                        View your submitted cases and
+                        track their status.
+                    </p>
+
+                    <span class="coming-soon">Coming Soon</span>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">&#9993;</div>
+                    <h3>Notifications</h3>
+                    <p>
+                        Stay updated on the progress
+                        of your submissions.
+                    </p>
+
+                    <span class="coming-soon">Coming Soon</span>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="site-footer">
+        &copy; FMSC Complaint & Suggestion Management System
+    </footer>
+
+</body>
+</html>
