@@ -181,3 +181,32 @@ cython_debug/
 .cursorindexingignore
 media/
 .vscode/
+
+
+# ==========================================
+# FMSC Complaint & Suggestion Management System
+# Project-specific exclusions
+# ==========================================
+
+# Local environment variables and secrets
+.env.*
+!.env.example
+
+# Django uploaded complaint attachments
+/media/
+
+# Additional SQLite temporary files
+db.sqlite3-shm
+db.sqlite3-wal
+
+# IDE settings
+.idea/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Temporary and backup files
+*.tmp
+*.bak
+*~
