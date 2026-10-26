@@ -15,6 +15,10 @@
             ← Back to cases
         </a>
 
+
+        {% for message in messages %}
+            <p class="message" role="status">{{ message }}</p>
+        {% endfor %}
         <article class="card">
             <p class="case-number">{{ case.case_number }}</p>
             <h1>{{ case.title }}</h1>
@@ -61,6 +65,15 @@
             <div class="description">
                 {{ case.description|linebreaks }}
             </div>
+
+            {% if perms.cases.change_case %}
+                <div class="actions">
+                    <a class="button"
+                    href="{% url 'management:case_assign' case.pk %}">
+                        Review and assign
+                    </a>
+                </div>
+            {% endif %}
         </article>
     </main>
 </body>
