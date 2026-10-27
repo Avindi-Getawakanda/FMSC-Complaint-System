@@ -1,0 +1,168 @@
+
+/* ==========================================
+   FMSC Complaint & Suggestion Management
+   Case Submission Page Styles
+   ========================================== */
+
+/* PAGE LAYOUT */
+
+.case-container {
+    width: 100%;
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 45px 20px 65px;
+    flex: 1;
+}
+
+.case-card {
+    background: #ffffff;
+    border: 1px solid #dfe5ee;
+    border-radius: 12px;
+    padding: 35px;
+    box-shadow: 0 5px 20px rgba(36, 50, 71, 0.06);
+}
+
+.case-card h1 {
+    color: #243247;
+    font-size: 27px;
+    margin: 12px 0;
+}
+
+.case-intro {
+    color: #637083;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+/* HEADER NAVIGATION */
+
+.header-link {
+    color: #2459a6;
+    font-size: 14px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.header-link:hover {
+    color: #1b447f;
+    text-decoration: underline;
+}
+
+/* FORM LAYOUT */
+
+.case-card .form-group {
+    margin-bottom: 22px;
+}
+
+.case-card .form-group label {
+    display: block;
+    color: #243247;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.case-card .form-group input,
+.case-card .form-group select,
+.case-card .form-group textarea {
+    width: 100%;
+    padding: 12px 14px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #243247;
+    background: #ffffff;
+    border: 1px solid #b8c5d6;
+    border-radius: 8px;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.case-card .form-group input:focus,
+.case-card .form-group select:focus,
+.case-card .form-group textarea:focus {
+    outline: none;
+    border-color: #2459a6;
+    box-shadow: 0 0 0 3px rgba(36, 89, 166, 0.10);
+}
+
+.case-card .form-group textarea {
+    min-height: 130px;
+    resize: vertical;
+}
+
+/* VALIDATION MESSAGES */
+
+.case-card .field-error {
+    color: #b42318;
+    font-size: 12px;
+    margin-top: 7px;
+}
+
+.case-card .form-help {
+    color: #637083;
+    font-size: 12px;
+    line-height: 1.5;
+    margin-top: 6px;
+}
+
+/* FORM ACTIONS */
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 18px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #dfe5ee;
+}
+
+.form-actions .btn-primary {
+    background: #2459a6;
+    color: #ffffff;
+    width: auto;
+    min-width: 150px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.form-actions .btn-primary:hover {
+    background: #1b447f;
+}
+
+.cancel-link {
+    color: #637083;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.cancel-link:hover {
+    color: #2459a6;
+    text-decoration: underline;
+}
+
+/* RESPONSIVE DESIGN */
+
+@media (max-width: 600px) {
+    .case-container {
+        padding: 25px 15px 45px;
+    }
+
+    .case-card {
+        padding: 24px 20px;
+    }
+
+    .case-card h1 {
+        font-size: 23px;
+    }
+
+    .form-actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+}

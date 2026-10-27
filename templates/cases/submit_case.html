@@ -1,0 +1,78 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit a Case | FMSC</title>
+    <link rel="stylesheet" href="{% static 'css/accounts.css' %}">
+    <link rel="stylesheet" href="{% static 'css/cases.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <div class="brand">
+                <span class="brand-name">FMSC</span>
+                <span class="brand-subtitle">
+                    Complaint & Suggestion Management System
+                </span>
+            </div>
+            <a href="{% url 'dashboard' %}" class="header-link">
+                Back to Dashboard
+            </a>
+        </div>
+    </header>
+
+    <main class="case-container">
+        <section class="case-card">
+            <span class="eyebrow">FMSC FEEDBACK PORTAL</span>
+            <h1>Submit a Complaint or Suggestion</h1>
+            <p class="case-intro">
+                Provide the details below so your submission can be reviewed.
+            </p>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="field-error">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
+
+                        {{ field }}
+
+                        {% if field.help_text %}
+                            <div class="form-help">{{ field.help_text }}</div>
+                        {% endif %}
+
+                        {% if field.errors %}
+                            <div class="field-error">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <div class="form-actions">
+                    <a href="{% url 'dashboard' %}" class="cancel-link">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        Submit Case
+                    </button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        &copy; FMSC Complaint & Suggestion Management System
+    </footer>
+</body>
+</html>
