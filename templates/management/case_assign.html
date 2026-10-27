@@ -1,43 +1,99 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Assign {{ case.case_number }} | FMSC</title>
 
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
+{% block title %}Assign Case | FMSC Feedback Portal{% endblock %}
 
-<body>
-    <main class="detail-container">
-        <a href="{% url 'management:case_detail' case.pk %}">
-            ← Back to case
+{% block page_label %}Review and Assign{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/management.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+
+    <div class="management-form-panel">
+
+        <a
+            href="{% url 'management:case_detail' case.pk %}"
+            class="back-link"
+        >
+            &larr; Back to case details
         </a>
 
-        <section class="card">
-            <p class="case-number">{{ case.case_number }}</p>
-            <h1>Review and assign</h1>
-            <p>{{ case.title }}</p>
+        <section class="case-panel">
 
-            <form method="post" class="case-form">
+            <div class="case-heading">
+                <div>
+                    <p class="case-number">{{ case.case_number }}</p>
+                    <h1>Review and Assign Case</h1>
+                </div>
+            </div>
+
+            <div class="case-summary">
+                <p><strong>Case:</strong> {{ case.title }}</p>
+            </div>
+
+            <p class="form-introduction">
+                Review the category and priority, then select
+                the authority responsible for handling this case.
+            </p>
+
+            <form method="post" class="management-form">
                 {% csrf_token %}
 
-                {{ form.non_field_errors }}
+                {% if form.non_field_errors %}
+                    <div class="form-error-summary" role="alert">
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
 
                 {% for field in form %}
                     <div class="form-group">
-                        {{ field.label_tag }}
+
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                            {% if field.field.required %}*{% endif %}
+                        </label>
+
                         {{ field }}
-                        {{ field.errors }}
+
+                        {% if field.help_text %}
+                            <div class="form-help">
+                                {{ field.help_text }}
+                            </div>
+                        {% endif %}
+
+                        {% for error in field.errors %}
+                            <p class="form-error" role="alert">
+                                {{ error }}
+                            </p>
+                        {% endfor %}
+
                     </div>
                 {% endfor %}
 
-                <button type="submit" class="button">
-                    Assign case
-                </button>
+                <div class="case-actions">
+                    <button type="submit" class="management-button">
+                        Confirm Assignment
+                    </button>
+
+                    <a
+                        href="{% url 'management:case_detail' case.pk %}"
+                        class="management-button management-button-outline"
+                    >
+                        Cancel
+                    </a>
+                </div>
+
             </form>
+
         </section>
-    </main>
-</body>
-</html>
+
+    </div>
+
+{% endblock %}

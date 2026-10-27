@@ -1,57 +1,97 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ case.case_number }} | FMSC</title>
 
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
+{% block title %}
+    {{ case.case_number }} | FMSC Feedback Portal
+{% endblock %}
 
-<body>
-    <main class="detail-container">
-        <a href="{% url 'management:case_list' %}">
-            ← Back to cases
+{% block page_label %}Case Details{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/management.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+
+    <div class="page-heading">
+        <a
+            href="{% url 'management:case_list' %}"
+            class="back-link"
+        >
+            &larr; Back to cases
         </a>
+    </div>
 
+    <article class="case-panel">
 
-        {% for message in messages %}
-            <p class="message" role="status">{{ message }}</p>
-        {% endfor %}
-        <article class="card">
-            <p class="case-number">{{ case.case_number }}</p>
-            <h1>{{ case.title }}</h1>
+        <div class="case-heading">
+            <div>
+                <p class="case-number">
+                    {{ case.case_number }}
+                </p>
 
-            <dl>
-                <dt>Type</dt>
+                <h1>{{ case.title }}</h1>
+            </div>
+
+            <span class="status-badge status-{{ case.status }}">
+                {{ case.get_status_display }}
+            </span>
+        </div>
+
+        <dl class="case-meta">
+
+            <div>
+                <dt>Case Type</dt>
                 <dd>{{ case.get_case_type_display }}</dd>
+            </div>
 
+            <div>
                 <dt>Category</dt>
                 <dd>{{ case.category.name }}</dd>
+            </div>
 
+            <div>
                 <dt>Priority</dt>
                 <dd>
-                    {% if case.priority == "urgent" %}
-                        <span class="urgent">Urgent</span>
-                    {% else %}
+                    <span
+                        {% if case.priority == "urgent" %}
+                            class="priority-urgent"
+                        {% endif %}
+                    >
                         {{ case.get_priority_display }}
-                    {% endif %}
+                    </span>
                 </dd>
+            </div>
 
+            <div>
                 <dt>Status</dt>
                 <dd>{{ case.get_status_display }}</dd>
+            </div>
 
+            <div>
                 <dt>Location</dt>
-                <dd>{{ case.location }}</dd>
+                <dd>
+                    {{ case.location|default:"Not specified" }}
+                </dd>
+            </div>
 
-                <dt>Submitted by</dt>
+            <div>
+                <dt>Submitted By</dt>
                 <dd>{{ case.submitted_by.username }}</dd>
+            </div>
 
-                <dt>Submitted on</dt>
-                <dd>{{ case.created_at|date:"d M Y, H:i" }}</dd>
+            <div>
+                <dt>Submitted On</dt>
+                <dd>
+                    {{ case.created_at|date:"d M Y, h:i A" }}
+                </dd>
+            </div>
 
-                <dt>Assigned authority</dt>
+            <div>
+                <dt>Assigned Authority</dt>
                 <dd>
                     {% if case.assigned_authority %}
                         {{ case.assigned_authority.name }}
@@ -59,22 +99,52 @@
                         Unassigned
                     {% endif %}
                 </dd>
-            </dl>
-
-            <h2>Description</h2>
-            <div class="description">
-                {{ case.description|linebreaks }}
             </div>
 
-            {% if user.is_superuser or user.profile.role == "administrator" or user.profile.role == "system_admin" %}
-                <div class="actions">
-                    <a class="button"
-                    href="{% url 'management:case_assign' case.pk %}">
-                        Review and assign
+        </dl>
+
+        <section class="case-section">
+            <h2>Description</h2>
+
+            <div class="case-description">
+                {{ case.description|linebreaks }}
+            </div>
+        </section>
+
+        {% if case.status == "rejected" %}
+            <section class="rejection-note">
+                <h2>Reason for Rejection</h2>
+
+                {{ case.rejection_reason|default:"No reason recorded."|linebreaks }}
+            </section>
+        {% endif %}
+
+        {% if user.is_superuser or user.profile.role == "administrator" or user.profile.role == "system_admin" %}
+
+            {% if case.status == "submitted" or case.status == "under_review" or case.status == "not_started" or case.status == "assigned" or case.status == "reopened" %}
+
+                <div class="case-actions">
+
+                    <a
+                        href="{% url 'management:case_assign' case.pk %}"
+                        class="management-button"
+                    >
+                        Review and Assign
                     </a>
+
+                    <a
+                        href="{% url 'management:case_reject' case.pk %}"
+                        class="management-button management-button-outline"
+                    >
+                        Reject Case
+                    </a>
+
                 </div>
+
             {% endif %}
-        </article>
-    </main>
-</body>
-</html>
+
+        {% endif %}
+
+    </article>
+
+{% endblock %}

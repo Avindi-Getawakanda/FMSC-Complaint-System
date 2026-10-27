@@ -88,6 +88,7 @@ class Case(models.Model):
     )
 
     resolution_note = models.TextField(blank=True)
+    rejection_reason = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     solved_at = models.DateTimeField(null=True, blank=True)

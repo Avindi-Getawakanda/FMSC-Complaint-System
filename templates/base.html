@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{% block title %}FMSC Feedback Portal{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    {% include "includes/navbar.html" %}
+
+    <div class="system-bar">
+        <div class="layout system-bar-content">
+            <span class="system-title">FMSC Feedback Portal</span>
+
+            <span class="system-label">
+                {% block page_label %}Home{% endblock %}
+            </span>
+        </div>
+    </div>
+
+    <main class="layout main-content">
+        {% for message in messages %}
+            <div class="alert" role="status">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include "includes/footer.html" %}
+</body>
+</html>

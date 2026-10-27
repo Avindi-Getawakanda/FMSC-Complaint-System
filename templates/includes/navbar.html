@@ -1,0 +1,62 @@
+{% load static %}
+
+<nav class="top-nav" aria-label="Main navigation">
+    <div class="layout nav-content">
+        {% if user.is_authenticated %}
+            <a href="{% url 'dashboard' %}" class="nav-home">
+                Home
+            </a>
+        {% else %}
+            <a href="{% url 'login' %}" class="nav-home">
+                Home
+            </a>
+        {% endif %}
+
+        <div class="nav-actions">
+            {% if user.is_authenticated %}
+                <span>{{ user.username }}</span>
+
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-button">
+                        Logout
+                    </button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" class="nav-home">
+                    Login
+                </a>
+
+                <a href="{% url 'register' %}" class="nav-home">
+                    Register
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<header class="university-header">
+    <div class="layout university-brand">
+        <img
+            src="{% static 'images/usj-logo.png' %}"
+            alt="University of Sri Jayewardenepura crest"
+            class="university-logo"
+            width="90"
+            height="90"
+        >
+
+        <div class="university-text">
+            <p class="faculty-name">
+                Faculty of Management Studies and Commerce
+            </p>
+
+            <p class="university-name">
+                University of Sri Jayewardenepura
+            </p>
+
+            <p class="portal-description">
+                Complaint &amp; Suggestion Management System
+            </p>
+        </div>
+    </div>
+</header>

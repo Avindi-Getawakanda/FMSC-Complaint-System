@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Reject Case | FMSC Feedback Portal{% endblock %}
+
+{% block page_label %}Reject Case{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/management.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+
+    <div class="management-form-panel">
+
+        <a
+            href="{% url 'management:case_detail' case.pk %}"
+            class="back-link"
+        >
+            &larr; Back to case details
+        </a>
+
+        <section class="case-panel">
+
+            <div class="case-heading">
+                <div>
+                    <p class="case-number">{{ case.case_number }}</p>
+                    <h1>Reject Case</h1>
+                </div>
+            </div>
+
+            <div class="case-summary">
+                <p><strong>Case:</strong> {{ case.title }}</p>
+            </div>
+
+            <p class="form-introduction">
+                Provide a clear reason for rejecting this case.
+                The reason will be recorded with the case.
+            </p>
+
+            <form method="post" class="management-form">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="form-error-summary" role="alert">
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="form-group">
+
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                            {% if field.field.required %}*{% endif %}
+                        </label>
+
+                        {{ field }}
+
+                        {% if field.help_text %}
+                            <div class="form-help">
+                                {{ field.help_text }}
+                            </div>
+                        {% endif %}
+
+                        {% for error in field.errors %}
+                            <p class="form-error" role="alert">
+                                {{ error }}
+                            </p>
+                        {% endfor %}
+
+                    </div>
+                {% endfor %}
+
+                <div class="case-actions">
+                    <button type="submit" class="management-button">
+                        Confirm Rejection
+                    </button>
+
+                    <a
+                        href="{% url 'management:case_detail' case.pk %}"
+                        class="management-button management-button-outline"
+                    >
+                        Cancel
+                    </a>
+                </div>
+
+            </form>
+
+        </section>
+
+    </div>
+
+{% endblock %}
