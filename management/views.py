@@ -1,7 +1,8 @@
 import json
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required
+from accounts.decorators import role_required
+from accounts.models import UserProfile
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -9,8 +10,11 @@ from cases.models import AuditLog, Case
 from .forms import CaseAssignmentForm
 
 
-@login_required(login_url="/admin/login/")
-@permission_required("cases.view_case", raise_exception=True)
+@role_required(
+    UserProfile.Role.ADMINISTRATOR,
+    UserProfile.Role.SYSTEM_ADMIN,
+    UserProfile.Role.MANAGEMENT,
+)
 def case_list(request):
     cases = Case.objects.select_related(
         "category",
@@ -24,8 +28,11 @@ def case_list(request):
         {"cases": cases},
     )
 
-@login_required(login_url="/admin/login/")
-@permission_required("cases.view_case", raise_exception=True)
+@role_required(
+    UserProfile.Role.ADMINISTRATOR,
+    UserProfile.Role.SYSTEM_ADMIN,
+    UserProfile.Role.MANAGEMENT,
+)
 def case_detail(request, pk):
     case = get_object_or_404(
         Case.objects.select_related(
@@ -42,10 +49,9 @@ def case_detail(request, pk):
         {"case": case},
     )
 
-@login_required(login_url="/admin/login/")
-@permission_required(
-    ("cases.view_case", "cases.change_case"),
-    raise_exception=True,
+@role_required(
+    UserProfile.Role.ADMINISTRATOR,
+    UserProfile.Role.SYSTEM_ADMIN,
 )
 @transaction.atomic
 def case_assign(request, pk):
