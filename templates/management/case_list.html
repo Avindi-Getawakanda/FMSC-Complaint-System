@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Case Management | FMSC</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+    <main class="container">
+        <h1>Case Management</h1>
+        <p class="subtitle">
+            FMSC Complaint &amp; Suggestion Management System
+        </p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">Case Number</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Priority</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Authority</th>
+                        <th scope="col">Submitted</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for case in cases %}
+                    <tr>
+                        <td>{{ case.case_number }}</td>
+
+                        <td>
+                            <a href="{% url 'management:case_detail' case.pk %}">
+                                {{ case.title }}
+                            </a>
+                        </td>
+
+                        <td>{{ case.category.name }}</td>
+
+                        <td>
+                            {% if case.priority == "urgent" %}
+                                <span class="urgent">Urgent</span>
+                            {% else %}
+                                {{ case.get_priority_display }}
+                            {% endif %}
+                        </td>
+
+                        <td>{{ case.get_status_display }}</td>
+
+                        <td>
+                            {% if case.assigned_authority %}
+                                {{ case.assigned_authority.name }}
+                            {% else %}
+                                Unassigned
+                            {% endif %}
+                        </td>
+
+                        <td>{{ case.created_at|date:"d M Y" }}</td>
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="empty">
+                            No cases have been submitted yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Assign {{ case.case_number }} | FMSC</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+    <main class="detail-container">
+        <a href="{% url 'management:case_detail' case.pk %}">
+            ← Back to case
+        </a>
+
+        <section class="card">
+            <p class="case-number">{{ case.case_number }}</p>
+            <h1>Review and assign</h1>
+            <p>{{ case.title }}</p>
+
+            <form method="post" class="case-form">
+                {% csrf_token %}
+
+                {{ form.non_field_errors }}
+
+                {% for field in form %}
+                    <div class="form-group">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {{ field.errors }}
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="button">
+                    Assign case
+                </button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

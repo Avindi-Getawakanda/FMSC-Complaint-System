@@ -1,0 +1,161 @@
+/* Shared page styles */
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6fa;
+    color: #243247;
+    margin: 0;
+    padding: 24px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+}
+
+a {
+    color: #2459a6;
+}
+
+h1 {
+    margin-bottom: 8px;
+}
+
+.subtitle,
+.case-number {
+    color: #637083;
+}
+
+.subtitle {
+    margin-bottom: 24px;
+}
+
+/* Case list */
+.table-wrapper {
+    background: white;
+    border-radius: 12px;
+    overflow-x: auto;
+    border: 1px solid #dfe5ee;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid #e8edf3;
+}
+
+th {
+    background: #eaf0f8;
+    white-space: nowrap;
+}
+
+.urgent {
+    color: #b42318;
+    font-weight: bold;
+}
+
+.empty {
+    text-align: center;
+    padding: 32px;
+}
+
+/* Case details */
+.detail-container {
+    max-width: 850px;
+    margin: auto;
+}
+
+.card {
+    background: white;
+    padding: 28px;
+    margin-top: 24px;
+    border: 1px solid #dfe5ee;
+    border-radius: 12px;
+}
+
+dt {
+    font-weight: bold;
+    margin-top: 18px;
+}
+
+dd {
+    margin: 6px 0 0;
+    overflow-wrap: anywhere;
+}
+
+.description {
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 16px;
+    }
+
+    .card {
+        padding: 20px;
+    }
+}
+/* Assignment form */
+.case-form,
+.actions {
+    margin-top: 24px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    font: inherit;
+    color: #243247;
+    background: white;
+    border: 1px solid #b8c5d6;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.button {
+    display: inline-block;
+    padding: 12px 20px;
+    color: white;
+    background: #2459a6;
+    border: none;
+    border-radius: 8px;
+    font: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.button:hover {
+    background: #1b447f;
+}
+
+.button:focus-visible {
+    outline: 3px solid #8ab4f8;
+    outline-offset: 3px;
+}
+
+.errorlist {
+    color: #b42318;
+}
+.message {
+    padding: 14px;
+    background: #e9f7ef;
+    color: #17643b;
+    border-radius: 8px;
+}
