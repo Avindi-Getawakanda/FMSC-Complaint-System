@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}My Cases | FMSC Feedback Portal{% endblock %}
+
+{% block page_label %}My Cases{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/my_cases.css' %}">
+{% endblock %}
+{% block content %}
+
+<section class="welcome-section">
+    <span class="eyebrow">CASE TRACKING</span>
+    <h1>My Cases</h1>
+    <p>
+        View your submitted complaints and suggestions
+        and track their current progress.
+    </p>
+</section>
+
+<section class="overview-card">
+    <h2>Submitted Cases ({{ cases|length }})</h2>
+
+    {% if cases %}
+        <div class="my-cases-table-wrapper">
+            <table class="my-cases-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Case Number</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Submitted On</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for case in cases %}
+                    <tr>
+                        <td class="case-number">{{ case.case_number }}</td>
+                        <td>{{ case.title }}</td>
+                        <td>{{ case.get_case_type_display }}</td>
+                        <td>{{ case.category.name }}</td>
+                        <td>
+                            <span class="case-status status-{{ case.status }}">
+                                    {{ case.get_status_display }}
+                            </span>
+                        </td>
+                        
+                        <td>{{ case.created_at|date:"d M Y" }}</td>
+                        <td>
+                            <a href="{% url 'case_detail' case.id %}" class="case-details-link">
+                                View Details
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="my-cases-empty">
+            <p>You haven't submitted any cases yet.</p>
+            <a href="{% url 'submit_case' %}" class="primary-button">
+                Submit a Case
+            </a>
+        </div>
+    {% endif %}
+</section>
+
+{% endblock %}

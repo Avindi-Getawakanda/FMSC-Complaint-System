@@ -152,7 +152,9 @@
                         their progress.
                     </p>
 
-                    <span class="coming-soon">Coming Soon</span>
+                    <a href="{% url 'my_cases' %}" class="primary-button">
+                        View My Cases
+                    </a>
                 </article>
 
             {% elif profile.role == "authority" %}
