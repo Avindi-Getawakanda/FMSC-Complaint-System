@@ -25,4 +25,10 @@ urlpatterns = [
         views.authority_edit,
         name="authority_edit",
     ),
+
+        path(
+        "assigned-cases/",
+        views.assigned_case_list,
+        name="assigned_case_list",
+    ),
 ]

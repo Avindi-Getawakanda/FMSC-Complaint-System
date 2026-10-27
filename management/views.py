@@ -267,3 +267,30 @@ def authority_edit(request, pk):
             "authority": authority,
         },
     )
+
+@role_required(UserProfile.Role.AUTHORITY)
+def assigned_case_list(request):
+    authority = Authority.objects.filter(
+        user=request.user,
+        is_active=True,
+    ).first()
+
+    cases = Case.objects.none()
+
+    if authority:
+        cases = Case.objects.filter(
+            assigned_authority=authority,
+        ).select_related(
+            "category",
+            "submitted_by",
+            "assigned_authority",
+        ).order_by("-created_at")
+
+    return render(
+        request,
+        "management/assigned_case_list.html",
+        {
+            "authority": authority,
+            "cases": cases,
+        },
+    )
