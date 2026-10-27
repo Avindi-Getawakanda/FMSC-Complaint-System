@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    {% if authority %}Edit Authority{% else %}Add Authority{% endif %}
+    | FMSC Feedback Portal
+{% endblock %}
+
+{% block page_label %}Authority Management{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/management.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+
+    <div class="management-form-panel">
+
+        <a
+            href="{% url 'management:authority_list' %}"
+            class="back-link"
+        >
+            &larr; Back to authorities
+        </a>
+
+        <section class="case-panel">
+
+            <div class="case-heading">
+                <div>
+                    <h1>
+                        {% if authority %}
+                            Edit Authority
+                        {% else %}
+                            Add Authority
+                        {% endif %}
+                    </h1>
+                </div>
+            </div>
+
+            <p class="form-introduction">
+                {% if authority %}
+                    Update the authority details below.
+                    Uncheck Active authority to exclude it from
+                    future case assignments.
+                {% else %}
+                    Register a unit or officer responsible for
+                    handling cases.
+                {% endif %}
+                Fields marked with * are required.
+            </p>
+
+            <form method="post" class="management-form">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="form-error-summary" role="alert">
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="form-group">
+
+                        {% if field.name == "is_active" %}
+                            <div class="checkbox-group">
+                                {{ field }}
+
+                                <label for="{{ field.id_for_label }}">
+                                    {{ field.label }}
+                                </label>
+                            </div>
+                        {% else %}
+                            <label for="{{ field.id_for_label }}">
+                                {{ field.label }}
+                                {% if field.field.required %}*{% endif %}
+                            </label>
+
+                            {{ field }}
+                        {% endif %}
+
+                        {% if field.help_text %}
+                            <div class="form-help">
+                                {{ field.help_text }}
+                            </div>
+                        {% endif %}
+
+                        {% for error in field.errors %}
+                            <p class="form-error" role="alert">
+                                {{ error }}
+                            </p>
+                        {% endfor %}
+
+                    </div>
+                {% endfor %}
+
+                <div class="case-actions">
+
+                    <button type="submit" class="management-button">
+                        {% if authority %}
+                            Save Changes
+                        {% else %}
+                            Save Authority
+                        {% endif %}
+                    </button>
+
+                    <a
+                        href="{% url 'management:authority_list' %}"
+                        class="management-button management-button-outline"
+                    >
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </div>
+
+{% endblock %}

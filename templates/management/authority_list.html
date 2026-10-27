@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Authorities | FMSC Feedback Portal{% endblock %}
+
+{% block page_label %}Authority Management{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/management.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+
+    <div class="management-heading">
+
+        <a href="{% url 'dashboard' %}" class="back-link">
+            &larr; Back to dashboard
+        </a>
+
+        <h1>Authority Management</h1>
+
+        <p>
+            Manage the units and officers responsible for handling
+            faculty complaints and suggestions.
+        </p>
+
+        <div class="management-heading-actions">
+            <a
+                href="{% url 'management:authority_create' %}"
+                class="management-button"
+            >
+                + Add Authority
+            </a>
+        </div>
+
+    </div>
+
+    <section class="case-list-panel" aria-label="Authorities">
+
+        <div
+            class="table-scroll"
+            role="region"
+            aria-label="Authority list"
+            tabindex="0"
+        >
+            <table class="case-table">
+
+                <caption>Registered Authorities</caption>
+
+                <thead>
+                    <tr>
+                        <th scope="col">Authority</th>
+                        <th scope="col">Unit</th>
+                        <th scope="col">Responsible Officer</th>
+                        <th scope="col">Contact Details</th>
+                        <th scope="col">Linked Account</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for authority in authorities %}
+                        <tr>
+
+                            <td>
+                                <strong>{{ authority.name }}</strong>
+                            </td>
+
+                            <td>
+                                {{ authority.unit|default:"Not specified" }}
+                            </td>
+
+                            <td>
+                                {{ authority.officer_name|default:"Not specified" }}
+
+                                {% if authority.designation %}
+                                    <span class="table-secondary">
+                                        {{ authority.designation }}
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if authority.email or authority.phone %}
+                                    {% if authority.email %}
+                                        <div>{{ authority.email }}</div>
+                                    {% endif %}
+
+                                    {% if authority.phone %}
+                                        <div>{{ authority.phone }}</div>
+                                    {% endif %}
+                                {% else %}
+                                    Not specified
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if authority.user %}
+                                    {{ authority.user.username }}
+                                {% else %}
+                                    No account linked
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if authority.is_active %}
+                                    <span class="status-badge authority-active">
+                                        Active
+                                    </span>
+                                {% else %}
+                                    <span class="status-badge authority-inactive">
+                                        Inactive
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <a
+                                    href="{% url 'management:authority_edit' authority.pk %}"
+                                    class="case-title-link"
+                                    aria-label="Edit {{ authority.name }}"
+                                >
+                                    Edit
+                                </a>
+                            </td>
+
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                No authorities have been added yet.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+    </section>
+
+{% endblock %}
