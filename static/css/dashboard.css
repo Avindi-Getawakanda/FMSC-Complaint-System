@@ -1,0 +1,410 @@
+:root {
+    /* Colours chosen to match your university reference. */
+    --university-red: #b60000;
+    --red-hover: #900000;
+    --university-gold: #ffbf00;
+    --slate: #34495e;
+    --text: #263545;
+    --muted: #647080;
+    --background: #f5f6f8;
+    --border: #e0e5eb;
+    --white: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--text);
+    background: var(--background);
+    line-height: 1.6;
+}
+
+.layout {
+    width: min(1180px, calc(100% - 48px));
+    margin-inline: auto;
+}
+
+a {
+    color: var(--university-red);
+}
+
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+a:focus-visible,
+button:focus-visible {
+    outline: 3px solid #986e00;
+    outline-offset: 4px;
+}
+
+/* Red navigation bar */
+.top-nav {
+    background: var(--university-red);
+    color: var(--white);
+}
+
+.nav-content,
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.nav-content {
+    justify-content: space-between;
+    min-height: 56px;
+    padding-block: 10px;
+}
+
+.nav-home {
+    color: var(--white);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.nav-home:hover {
+    text-decoration: underline;
+}
+
+.nav-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 16px;
+    overflow-wrap: anywhere;
+}
+
+.nav-actions form {
+    margin: 0;
+}
+
+.logout-button {
+    padding: 7px 16px;
+    border: 1px solid var(--white);
+    border-radius: 5px;
+    background: transparent;
+    color: var(--white);
+    font: inherit;
+    cursor: pointer;
+}
+
+.logout-button:hover {
+    background: var(--white);
+    color: var(--university-red);
+}
+
+/* University identity */
+.university-header {
+    background: var(--white);
+    border-bottom: 4px solid var(--university-red);
+}
+
+.university-brand {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding-block: 26px;
+}
+
+.university-logo {
+    width: 90px;
+    height: 90px;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+
+.university-text p {
+    margin: 0;
+}
+
+.faculty-name {
+    font-size: 22px;
+    font-weight: bold;
+    line-height: 1.35;
+}
+
+.university-name {
+    padding-top: 5px;
+    color: #535d68;
+    font-size: 17px;
+}
+
+.portal-description {
+    padding-top: 3px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+/* Blue-grey title bar */
+.system-bar {
+    background: var(--slate);
+    color: var(--white);
+}
+
+.system-bar-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-block: 15px;
+}
+
+.system-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.system-label {
+    padding: 4px 14px;
+    background: var(--university-gold);
+    color: #302500;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Main content */
+.main-content {
+    flex: 1;
+    padding-block: 40px 56px;
+}
+
+.welcome-section {
+    margin-bottom: 28px;
+}
+
+.eyebrow {
+    margin: 0 0 8px;
+    color: var(--university-red);
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1.8px;
+}
+
+h1 {
+    margin: 0 0 10px;
+    font-size: clamp(26px, 4vw, 34px);
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+}
+
+.welcome-description {
+    margin: 0;
+    color: var(--muted);
+}
+
+.alert {
+    margin-bottom: 24px;
+    padding: 14px 18px;
+    border: 1px solid #c9d8e7;
+    border-radius: 8px;
+    background: #edf3f9;
+    color: #29425b;
+}
+
+/* Account overview */
+.overview-card {
+    padding: 28px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-top: 4px solid var(--university-red);
+    border-radius: 10px;
+    box-shadow: 0 4px 18px rgb(30 45 60 / 4%);
+}
+
+h2 {
+    margin: 0 0 22px;
+    font-size: 21px;
+    line-height: 1.35;
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin: 0;
+}
+
+.profile-item dt {
+    margin-bottom: 8px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.profile-item dd {
+    margin: 0;
+    font-weight: bold;
+    overflow-wrap: anywhere;
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #fff3ce;
+    color: #694b00;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* Feature cards */
+.quick-access {
+    margin-top: 34px;
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.feature-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 28px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 4px 18px rgb(30 45 60 / 4%);
+}
+
+.feature-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    margin-bottom: 20px;
+    background: #fceaea;
+    color: var(--university-red);
+    border-radius: 10px;
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.feature-icon.gold {
+    background: #fff3ce;
+    color: #775400;
+}
+
+.feature-icon.slate {
+    background: #eaf0f5;
+    color: var(--slate);
+}
+
+.feature-card h3 {
+    margin: 0 0 10px;
+    font-size: 19px;
+}
+
+.feature-card p {
+    margin: 0 0 26px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.primary-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: auto;
+    padding: 10px 18px;
+    border-radius: 5px;
+    background: var(--university-red);
+    color: var(--white);
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.primary-button:hover {
+    background: var(--red-hover);
+}
+
+.coming-soon {
+    margin-top: auto;
+    padding: 6px 12px;
+    background: #edf0f3;
+    color: #566273;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Footer */
+.site-footer {
+    padding-block: 22px;
+    border-top: 4px solid var(--university-gold);
+    background: var(--slate);
+    color: var(--white);
+    text-align: center;
+    font-size: 13px;
+}
+
+.site-footer p {
+    margin: 2px 0;
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+    .feature-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    .layout {
+        width: calc(100% - 32px);
+    }
+
+    .university-brand {
+        align-items: flex-start;
+        gap: 14px;
+        padding-block: 20px;
+    }
+
+    .university-logo {
+        width: 64px;
+        height: 64px;
+    }
+
+    .faculty-name {
+        font-size: 17px;
+    }
+
+    .university-name {
+        font-size: 14px;
+    }
+
+    .portal-description {
+        font-size: 12px;
+    }
+
+    .system-title {
+        font-size: 16px;
+    }
+
+    .main-content {
+        padding-block: 28px 40px;
+    }
+
+    .profile-grid,
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .overview-card,
+    .feature-card {
+        padding: 22px;
+    }
+}
