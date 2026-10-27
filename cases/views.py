@@ -1,13 +1,13 @@
 # Create your views here.
 
 from django.contrib import messages
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
 from accounts.decorators import role_required
 from accounts.models import UserProfile
 
 from .forms import CaseSubmissionForm
-from .models import Attachment
+from .models import Attachment, Case
 
 
 @role_required(
@@ -46,5 +46,56 @@ def submit_case(request):
         "cases/submit_case.html",
         {"form": form}
     )
+
+@role_required(
+    UserProfile.Role.STUDENT,
+    UserProfile.Role.LECTURER,
+)
+def my_cases(request):
+    cases = (
+        Case.objects
+        .filter(submitted_by=request.user)
+        .select_related("category")
+        .order_by("-created_at")
+    )
+
+    return render(
+        request,
+        "cases/my_cases.html",
+        {"cases": cases}
+    )
+
+
+
+@role_required(
+    UserProfile.Role.STUDENT,
+    UserProfile.Role.LECTURER,
+)
+def case_detail(request, case_id):
+    case = get_object_or_404(
+        Case.objects.select_related("category", "assigned_authority"),
+        pk=case_id,
+        submitted_by=request.user,
+    )
+
+    activity_history = (
+        case.audit_logs
+        .select_related("actor")
+        .order_by("created_at")
+    )
+
+    attachments = case.attachments.all()
+
+    return render(
+        request,
+        "cases/case_detail.html",
+        {
+            "case": case,
+            "activity_history": activity_history,
+            "attachments": attachments,
+        },
+    )
+
+
 
 

@@ -1,0 +1,227 @@
+
+/* My Cases - Table and Tracking Styles */
+
+.my-cases-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.my-cases-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 18px;
+}
+
+.my-cases-table th,
+.my-cases-table td {
+    padding: 15px 14px;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid #e5e9ef;
+}
+
+.my-cases-table th {
+    color: #24374b;
+    background-color: #f5f7fa;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.my-cases-table td {
+    color: #334155;
+    font-size: 14px;
+}
+
+.my-cases-table tbody tr:hover {
+    background-color: #fafbfd;
+}
+
+.my-cases-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.case-number {
+    font-weight: 600;
+    color: #b80000;
+    white-space: nowrap;
+}
+
+.case-status {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background-color: #e8eef5;
+    color: #34495e;
+    white-space: nowrap;
+}
+
+.case-status.status-submitted {
+    background-color: #e8f0fe;
+    color: #2456a6;
+}
+
+.case-status.status-under_review,
+.case-status.status-in_progress,
+.case-status.status-assigned {
+    background-color: #fff2d9;
+    color: #946200;
+}
+
+.case-status.status-solved,
+.case-status.status-closed {
+    background-color: #e4f5e9;
+    color: #207341;
+}
+
+.case-status.status-rejected {
+    background-color: #fde8e8;
+    color: #a32626;
+}
+
+.my-cases-empty {
+    padding: 30px 16px;
+    text-align: center;
+}
+
+.my-cases-empty p {
+    margin-bottom: 20px;
+    color: #64748b;
+}
+
+@media (max-width: 768px) {
+    .my-cases-table th,
+    .my-cases-table td {
+        padding: 12px 10px;
+        font-size: 12px;
+    }
+}
+
+
+/* Case Details and Tracking */
+
+.case-details-link {
+    display: inline-block;
+    color: #b80000;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.case-details-link:hover {
+    text-decoration: underline;
+}
+
+.case-detail-card {
+    margin-bottom: 32px;
+}
+
+.case-detail-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.case-detail-heading h2 {
+    margin: 10px 0 0;
+}
+
+.case-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin: 20px 0 30px;
+}
+
+.case-info-grid > div {
+    background: #f5f7fa;
+    padding: 16px;
+    border-radius: 8px;
+}
+
+.case-info-grid dt {
+    color: #64748b;
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.case-info-grid dd {
+    color: #24374b;
+    font-weight: 600;
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.case-detail-section {
+    border-top: 1px solid #e5e9ef;
+    padding: 24px 0;
+}
+
+.case-detail-section h3 {
+    margin-top: 0;
+    margin-bottom: 14px;
+}
+
+.case-detail-section p {
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.case-attachment-list {
+    padding-left: 20px;
+}
+
+.case-attachment-list li {
+    margin-bottom: 10px;
+}
+
+.case-attachment-list span {
+    color: #64748b;
+    margin-left: 12px;
+    font-size: 13px;
+}
+
+.case-timeline {
+    border-left: 2px solid #dbe3ec;
+    margin: 20px 0 20px 10px;
+    padding-left: 24px;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 24px;
+}
+
+.timeline-dot {
+    position: absolute;
+    left: -32px;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #b80000;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px #b80000;
+}
+
+.timeline-item strong {
+    color: #24374b;
+}
+
+.timeline-item p,
+.timeline-empty {
+    color: #64748b;
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+@media (max-width: 768px) {
+    .case-info-grid {
+        grid-template-columns: 1fr;
+    }
+}
