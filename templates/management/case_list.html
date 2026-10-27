@@ -1,23 +1,42 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Case Management | FMSC</title>
 
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
+{% block title %}Case Management | FMSC Feedback Portal{% endblock %}
 
-<body>
-    <main class="container">
+{% block page_label %}Case Management{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/management.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+
+    <div class="management-heading">
+        <a href="{% url 'dashboard' %}" class="back-link">
+            &larr; Back to dashboard
+        </a>
+
         <h1>Case Management</h1>
-        <p class="subtitle">
-            FMSC Complaint &amp; Suggestion Management System
-        </p>
 
-        <div class="table-wrapper">
-            <table>
+        <p>
+            View submitted complaints and suggestions,
+            their current status and assigned authorities.
+        </p>
+    </div>
+
+    <section class="case-list-panel" aria-label="Submitted cases">
+        <div
+            class="table-scroll"
+            role="region"
+            aria-label="Case list"
+            tabindex="0"
+        >
+            <table class="case-table">
+                <caption>Complaints and Suggestions</caption>
+
                 <thead>
                     <tr>
                         <th scope="col">Case Number</th>
@@ -32,48 +51,62 @@
 
                 <tbody>
                     {% for case in cases %}
-                    <tr>
-                        <td>{{ case.case_number }}</td>
+                        <tr>
+                            <td class="case-reference">
+                                {{ case.case_number }}
+                            </td>
 
-                        <td>
-                            <a href="{% url 'management:case_detail' case.pk %}">
-                                {{ case.title }}
-                            </a>
-                        </td>
+                            <td>
+                                <a
+                                    href="{% url 'management:case_detail' case.pk %}"
+                                    class="case-title-link"
+                                >
+                                    {{ case.title }}
+                                </a>
+                            </td>
 
-                        <td>{{ case.category.name }}</td>
+                            <td>
+                                {{ case.category.name }}
+                            </td>
 
-                        <td>
-                            {% if case.priority == "urgent" %}
-                                <span class="urgent">Urgent</span>
-                            {% else %}
-                                {{ case.get_priority_display }}
-                            {% endif %}
-                        </td>
+                            <td>
+                                <span
+                                    {% if case.priority == "urgent" %}
+                                        class="priority-urgent"
+                                    {% endif %}
+                                >
+                                    {{ case.get_priority_display }}
+                                </span>
+                            </td>
 
-                        <td>{{ case.get_status_display }}</td>
+                            <td>
+                                <span class="status-badge status-{{ case.status }}">
+                                    {{ case.get_status_display }}
+                                </span>
+                            </td>
 
-                        <td>
-                            {% if case.assigned_authority %}
-                                {{ case.assigned_authority.name }}
-                            {% else %}
-                                Unassigned
-                            {% endif %}
-                        </td>
+                            <td>
+                                {% if case.assigned_authority %}
+                                    {{ case.assigned_authority.name }}
+                                {% else %}
+                                    Unassigned
+                                {% endif %}
+                            </td>
 
-                        <td>{{ case.created_at|date:"d M Y" }}</td>
-                    </tr>
-
+                            <td>
+                                {{ case.created_at|date:"d M Y" }}
+                            </td>
+                        </tr>
                     {% empty %}
-                    <tr>
-                        <td colspan="7" class="empty">
-                            No cases have been submitted yet.
-                        </td>
-                    </tr>
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                No cases have been submitted yet.
+                            </td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-    </main>
-</body>
-</html>
+    </section>
+
+{% endblock %}

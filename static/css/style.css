@@ -159,3 +159,38 @@ dd {
     color: #17643b;
     border-radius: 8px;
 }
+
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    font: inherit;
+    color: #243247;
+    background: white;
+    border: 1px solid #b8c5d6;
+    border-radius: 8px;
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.button-danger {
+    background: #b60000;
+}
+
+.button-danger:hover {
+    background: #900000;
+}
+
+.rejection-note {
+    margin-top: 24px;
+    padding: 18px;
+    background: #fff1f1;
+    border-left: 4px solid #b60000;
+    border-radius: 6px;
+    overflow-wrap: anywhere;
+}

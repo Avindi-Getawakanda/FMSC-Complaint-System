@@ -26,3 +26,24 @@ class CaseAssignmentForm(forms.ModelForm):
 
         self.fields["assigned_authority"].required = True
         self.fields["assigned_authority"].empty_label = "Select an authority"
+
+
+class CaseRejectionForm(forms.ModelForm):
+    rejection_reason = forms.CharField(
+        label="Reason for rejection",
+        required=True,
+        strip=True,
+        widget=forms.Textarea(
+            attrs={
+                "rows": 4,
+                "placeholder": "Explain why this case is being rejected.",
+            }
+        ),
+        error_messages={
+            "required": "Please provide a reason for rejecting this case.",
+        },
+    )
+
+    class Meta:
+        model = Case
+        fields = ["rejection_reason"]

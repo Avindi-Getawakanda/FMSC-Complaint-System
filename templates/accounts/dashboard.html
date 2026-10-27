@@ -1,265 +1,175 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "base.html" %}
 
-    <title>Dashboard | FMSC Feedback Portal</title>
+{% block title %}Dashboard | FMSC Feedback Portal{% endblock %}
 
-    <link rel="stylesheet"
-          href="{% static 'css/dashboard.css' %}">
-</head>
+{% block page_label %}Dashboard{% endblock %}
 
-<body>
+{% block content %}
 
-    <nav class="top-nav" aria-label="Main navigation">
-        <div class="layout nav-content">
-            <a href="{% url 'dashboard' %}" class="nav-home">
-                Home
-            </a>
+    <section class="welcome-section">
+        <span class="eyebrow">YOUR PERSONAL DASHBOARD</span>
 
-            <div class="nav-actions">
-                <span>{{ request.user.username }}</span>
+        <h1>Welcome, {{ request.user.username }}!</h1>
 
-                <form method="post" action="{% url 'logout' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="logout-button">
-                        Logout
-                    </button>
-                </form>
+        <p>
+            Manage your feedback and stay informed about its progress.
+        </p>
+    </section>
+
+    <section class="overview-card">
+        <h2>Account Overview</h2>
+
+        <dl class="profile-grid">
+
+            <div class="profile-item">
+                <dt>Username</dt>
+                <dd>{{ request.user.username }}</dd>
             </div>
-        </div>
-    </nav>
 
-    <header class="university-header">
-        <div class="layout university-brand">
-            <img
-                src="{% static 'images/usj-logo.png' %}"
-                alt="University of Sri Jayewardenepura crest"
-                class="university-logo"
-                width="90"
-                height="90"
-            >
-
-            <div class="university-text">
-                <p class="faculty-name">
-                    Faculty of Management Studies and Commerce
-                </p>
-                <p class="university-name">
-                    University of Sri Jayewardenepura
-                </p>
-                <p class="portal-description">
-                    Complaint &amp; Suggestion Management System
-                </p>
+            <div class="profile-item">
+                <dt>Account Role</dt>
+                <dd>
+                    <span class="role-badge">
+                        {% if request.user.is_superuser %}
+                            System Administrator
+                        {% else %}
+                            {{ profile.get_role_display }}
+                        {% endif %}
+                    </span>
+                </dd>
             </div>
-        </div>
-    </header>
 
-    <div class="system-bar">
-        <div class="layout system-bar-content">
-            <span class="system-title">FMSC Feedback Portal</span>
-            <span class="system-label">Dashboard</span>
-        </div>
-    </div>
-
-    <main class="layout main-content">
-
-        <section class="welcome-section" aria-labelledby="welcome-title">
-            <p class="eyebrow">YOUR DASHBOARD</p>
-
-            <h1 id="welcome-title">
-                Welcome, {{ request.user.first_name|default:request.user.username }}!
-            </h1>
-
-            {% if user.is_superuser or profile.role == "administrator" or profile.role == "system_admin" %}
-                <p class="welcome-description">
-                    Review faculty feedback, assign responsibilities,
-                    and monitor case progress.
-                </p>
-
-            {% elif profile.role == "management" %}
-                <p class="welcome-description">
-                    View faculty cases and monitor their progress.
-                </p>
-
-            {% elif profile.role == "authority" %}
-                <p class="welcome-description">
-                    Manage assigned cases and keep their progress updated.
-                </p>
-
-            {% else %}
-                <p class="welcome-description">
-                    Share your feedback and stay informed about its progress.
-                </p>
-            {% endif %}
-        </section>
-
-        {% for message in messages %}
-            <div class="alert" role="status">
-                {{ message }}
+            <div class="profile-item">
+                <dt>Department</dt>
+                <dd>
+                    {{ profile.department|default:"Not specified" }}
+                </dd>
             </div>
-        {% endfor %}
 
-        <section class="overview-card" aria-labelledby="overview-title">
-            <h2 id="overview-title">Account Overview</h2>
+        </dl>
+    </section>
 
-            <dl class="profile-grid">
-                <div class="profile-item">
-                    <dt>Username</dt>
-                    <dd>{{ request.user.username }}</dd>
-                </div>
+    <section class="quick-access">
+        <h2>Quick Access</h2>
 
-                <div class="profile-item">
-                    <dt>Account Role</dt>
-                    <dd>
-                        <span class="role-badge">
-                            {% if user.is_superuser %}
-                                System Administrator
-                            {% else %}
-                                {{ profile.get_role_display }}
-                            {% endif %}
-                        </span>
-                    </dd>
-                </div>
+        <div class="feature-grid">
 
-                <div class="profile-item">
-                    <dt>Department</dt>
-                    <dd>
-                        {{ profile.department|default:"Not specified" }}
-                    </dd>
-                </div>
-            </dl>
-        </section>
-
-        <section class="quick-access" aria-labelledby="quick-access-title">
-            <h2 id="quick-access-title">Quick Access</h2>
-
-            <div class="feature-grid">
-
-                {% if user.is_superuser or profile.role == "administrator" or profile.role == "system_admin" %}
-
-                    <article class="feature-card">
-                        <span class="feature-icon" aria-hidden="true">
-                            &#9776;
-                        </span>
-
-                        <h3>Manage Cases</h3>
-
-                        <p>
-                            Review complaints and suggestions,
-                            confirm priorities, and assign authorities.
-                        </p>
-
-                        <a href="{% url 'management:case_list' %}"
-                           class="primary-button">
-                            View Cases <span aria-hidden="true">&rarr;</span>
-                        </a>
-                    </article>
-
-                {% elif profile.role == "management" %}
-
-                    <article class="feature-card">
-                        <span class="feature-icon" aria-hidden="true">
-                            &#9776;
-                        </span>
-
-                        <h3>View Cases</h3>
-
-                        <p>
-                            View submitted faculty cases
-                            and their current progress.
-                        </p>
-
-                        <a href="{% url 'management:case_list' %}"
-                           class="primary-button">
-                            View Cases <span aria-hidden="true">&rarr;</span>
-                        </a>
-                    </article>
-
-                {% elif profile.role == "student" or profile.role == "lecturer" %}
-
-                    <article class="feature-card">
-                        <span class="feature-icon" aria-hidden="true">
-                            +
-                        </span>
-
-                        <h3>Submit a Case</h3>
-
-                        <p>
-                            Report a faculty issue or share
-                            a suggestion for improvement.
-                        </p>
-
-                        <a href="{% url 'submit_case' %}"
-                           class="primary-button">
-                            Submit Now <span aria-hidden="true">&rarr;</span>
-                        </a>
-                    </article>
-
-                    <article class="feature-card">
-                        <span class="feature-icon gold" aria-hidden="true">
-                            &#9776;
-                        </span>
-
-                        <h3>My Cases</h3>
-
-                        <p>
-                            View your submissions and
-                            follow their progress.
-                        </p>
-
-                        <span class="coming-soon">Coming Soon</span>
-                    </article>
-
-                {% elif profile.role == "authority" %}
-
-                    <article class="feature-card">
-                        <span class="feature-icon" aria-hidden="true">
-                            &#9776;
-                        </span>
-
-                        <h3>Assigned Cases</h3>
-
-                        <p>
-                            View your assigned work and
-                            record progress towards resolution.
-                        </p>
-
-                        <span class="coming-soon">Coming Soon</span>
-                    </article>
-
-                {% endif %}
+            {% if request.user.is_superuser or profile.role == "administrator" or profile.role == "system_admin" %}
 
                 <article class="feature-card">
-                    <span class="feature-icon slate" aria-hidden="true">
-                        &#9993;
-                    </span>
+                    <div class="feature-icon" aria-hidden="true">
+                        &#9776;
+                    </div>
 
-                    <h3>Notifications</h3>
+                    <h3>Manage Cases</h3>
 
                     <p>
-                        Stay informed about case updates
-                        relevant to your account.
+                        Review complaints and suggestions, assign
+                        authorities, and monitor case progress.
+                    </p>
+
+                    <a
+                        href="{% url 'management:case_list' %}"
+                        class="primary-button"
+                    >
+                        View Cases
+                    </a>
+                </article>
+
+            {% elif profile.role == "management" %}
+
+                <article class="feature-card">
+                    <div class="feature-icon" aria-hidden="true">
+                        &#9776;
+                    </div>
+
+                    <h3>View Cases</h3>
+
+                    <p>
+                        View submitted complaints and suggestions
+                        and follow their current progress.
+                    </p>
+
+                    <a
+                        href="{% url 'management:case_list' %}"
+                        class="primary-button"
+                    >
+                        View Cases
+                    </a>
+                </article>
+
+            {% elif profile.role == "student" or profile.role == "lecturer" %}
+
+                <article class="feature-card">
+                    <div class="feature-icon" aria-hidden="true">
+                        +
+                    </div>
+
+                    <h3>Submit a Case</h3>
+
+                    <p>
+                        Submit a complaint or suggestion to help
+                        improve faculty services and facilities.
+                    </p>
+
+                    <a
+                        href="{% url 'submit_case' %}"
+                        class="primary-button"
+                    >
+                        Submit Now
+                    </a>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon gold" aria-hidden="true">
+                        &#9776;
+                    </div>
+
+                    <h3>My Cases</h3>
+
+                    <p>
+                        View your submitted cases and track
+                        their progress.
                     </p>
 
                     <span class="coming-soon">Coming Soon</span>
                 </article>
 
-            </div>
-        </section>
+            {% elif profile.role == "authority" %}
 
-    </main>
+                <article class="feature-card">
+                    <div class="feature-icon" aria-hidden="true">
+                        &#9776;
+                    </div>
 
-    <footer class="site-footer">
-        <div class="layout">
-            <p>
-                &copy; {% now "Y" %}
-                Faculty of Management Studies and Commerce
-            </p>
-            <p>University of Sri Jayewardenepura</p>
+                    <h3>Assigned Cases</h3>
+
+                    <p>
+                        View cases assigned to your authority
+                        and provide progress updates.
+                    </p>
+
+                    <span class="coming-soon">Coming Soon</span>
+                </article>
+
+            {% endif %}
+
+            <article class="feature-card">
+                <div class="feature-icon slate" aria-hidden="true">
+                    &#9993;
+                </div>
+
+                <h3>Notifications</h3>
+
+                <p>
+                    Stay informed about case updates and
+                    information relevant to your account.
+                </p>
+
+                <span class="coming-soon">Coming Soon</span>
+            </article>
+
         </div>
-    </footer>
+    </section>
 
-</body>
-</html>
+{% endblock %}
