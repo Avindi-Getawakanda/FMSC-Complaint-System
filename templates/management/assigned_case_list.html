@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Assigned Cases | FMSC Feedback Portal{% endblock %}
+
+{% block page_label %}Assigned Cases{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/management.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+
+    <div class="management-heading">
+        <a href="{% url 'dashboard' %}" class="back-link">
+            &larr; Back to dashboard
+        </a>
+
+        <h1>Assigned Cases</h1>
+
+        {% if authority %}
+            <p>
+                Cases assigned to
+                <strong>{{ authority.name }}</strong>.
+            </p>
+        {% else %}
+            <p>
+                Your account is not linked to an active authority.
+                Please contact a system administrator.
+            </p>
+        {% endif %}
+    </div>
+
+    {% if authority %}
+        <section class="case-list-panel" aria-label="Assigned cases">
+
+            <div
+                class="table-scroll"
+                role="region"
+                aria-label="Assigned case list"
+                tabindex="0"
+            >
+                <table class="case-table">
+
+                    <caption>Your Authority’s Cases</caption>
+
+                    <thead>
+                        <tr>
+                            <th scope="col">Case Number</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Priority</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Submitted</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for case in cases %}
+                            <tr>
+                                <td class="case-reference">
+                                    {{ case.case_number }}
+                                </td>
+
+                                <td>{{ case.title }}</td>
+
+                                <td>{{ case.category.name }}</td>
+
+                                <td>
+                                    <span
+                                        {% if case.priority == "urgent" %}
+                                            class="priority-urgent"
+                                        {% endif %}
+                                    >
+                                        {{ case.get_priority_display }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="status-badge status-{{ case.status }}">
+                                        {{ case.get_status_display }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {{ case.created_at|date:"d M Y" }}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="empty-state">
+                                    No cases are currently assigned
+                                    to your authority.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+
+        </section>
+    {% endif %}
+
+{% endblock %}

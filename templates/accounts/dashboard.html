@@ -157,7 +157,7 @@
 
             {% elif profile.role == "authority" %}
 
-                <article class="feature-card">
+                                <article class="feature-card">
                     <div class="feature-icon" aria-hidden="true">
                         &#9776;
                     </div>
@@ -166,10 +166,15 @@
 
                     <p>
                         View cases assigned to your authority
-                        and provide progress updates.
+                        and follow their current status.
                     </p>
 
-                    <span class="coming-soon">Coming Soon</span>
+                    <a
+                        href="{% url 'management:assigned_case_list' %}"
+                        class="primary-button"
+                    >
+                        View Assigned Cases
+                    </a>
                 </article>
 
             {% endif %}
