@@ -1,0 +1,86 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | FMSC Feedback Portal</title>
+    <link rel="stylesheet" href="{% static 'css/accounts.css' %}">
+</head>
+<body class="auth-page">
+
+    <header class="site-header">
+        <div class="header-content">
+            <div class="brand">
+                <span class="brand-name">FMSC</span>
+                <span class="brand-subtitle">
+                    Complaint & Suggestion Management System
+                </span>
+            </div>
+            <span class="university-name">
+                University of Sri Jayewardenepura
+            </span>
+        </div>
+    </header>
+
+    <main class="auth-container">
+        <section class="auth-card register-card">
+            <div class="card-heading">
+                <span class="eyebrow">JOIN THE FMSC PORTAL</span>
+                <h1>Create Account</h1>
+                <p>
+                    Register to submit complaints, share suggestions
+                    and track their progress.
+                </p>
+            </div>
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-error">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
+
+                        {{ field }}
+
+                        {% if field.help_text %}
+                            <div class="form-help">
+                                {{ field.help_text }}
+                            </div>
+                        {% endif %}
+
+                        {% if field.errors %}
+                            <div class="field-error">
+                                {{ field.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="btn btn-primary">
+                    Create Account
+                </button>
+            </form>
+
+            <p class="auth-footer">
+                Already have an account?
+                <a href="{% url 'login' %}">Sign In</a>
+            </p>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        &copy; FMSC Complaint & Suggestion Management System
+    </footer>
+
+</body>
+</html>
