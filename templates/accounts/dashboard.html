@@ -76,6 +76,26 @@
                     </a>
                 </article>
 
+                <article class="feature-card">
+                    <div class="feature-icon gold" aria-hidden="true">
+                        &#9881;
+                    </div>
+
+                    <h3>Manage Authorities</h3>
+
+                    <p>
+                        Add responsible units, update officer details,
+                        and manage authority availability.
+                    </p>
+
+                    <a
+                        href="{% url 'management:authority_list' %}"
+                        class="primary-button"
+                    >
+                        View Authorities
+                    </a>
+                </article>
+
             {% elif profile.role == "management" %}
 
                 <article class="feature-card">

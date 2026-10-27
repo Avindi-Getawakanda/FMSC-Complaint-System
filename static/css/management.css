@@ -411,3 +411,41 @@
     color: #647080;
     line-height: 1.7;
 }
+
+.authority-active {
+    background: #e5f4e9;
+    color: #256337;
+}
+
+.authority-inactive {
+    background: #edf1f5;
+    color: #526170;
+}
+
+.table-secondary {
+    display: block;
+    margin-top: 4px;
+    color: #647080;
+    font-size: 12px;
+}
+
+.management-form .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.management-form .checkbox-group input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: #b60000;
+}
+
+.management-form .checkbox-group label {
+    margin: 0;
+}
+
+.management-heading-actions {
+    margin-top: 20px;
+}

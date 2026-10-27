@@ -8,6 +8,12 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from cases.models import AuditLog, Case
 from .forms import CaseAssignmentForm , CaseRejectionForm
+from .models import Authority
+from .forms import (
+    AuthorityForm,
+    CaseAssignmentForm,
+    CaseRejectionForm,
+)
 
 
 @role_required(
@@ -190,4 +196,74 @@ def case_reject(request, pk):
         request,
         "management/case_reject.html",
         {"case": case, "form": form},
+    )
+
+@role_required(
+    UserProfile.Role.ADMINISTRATOR,
+    UserProfile.Role.SYSTEM_ADMIN,
+)
+def authority_list(request):
+    authorities = Authority.objects.select_related("user").order_by("name")
+
+    return render(
+        request,
+        "management/authority_list.html",
+        {"authorities": authorities},
+    )
+
+@role_required(
+    UserProfile.Role.ADMINISTRATOR,
+    UserProfile.Role.SYSTEM_ADMIN,
+)
+def authority_create(request):
+    if request.method == "POST":
+        form = AuthorityForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(
+                request,
+                "Authority added successfully.",
+            )
+
+            return redirect("management:authority_list")
+    else:
+        form = AuthorityForm()
+
+    return render(
+        request,
+        "management/authority_form.html",
+        {"form": form},
+    )
+
+@role_required(
+    UserProfile.Role.ADMINISTRATOR,
+    UserProfile.Role.SYSTEM_ADMIN,
+)
+def authority_edit(request, pk):
+    authority = get_object_or_404(Authority, pk=pk)
+
+    if request.method == "POST":
+        form = AuthorityForm(request.POST, instance=authority)
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(
+                request,
+                "Authority updated successfully.",
+            )
+
+            return redirect("management:authority_list")
+    else:
+        form = AuthorityForm(instance=authority)
+
+    return render(
+        request,
+        "management/authority_form.html",
+        {
+            "form": form,
+            "authority": authority,
+        },
     )
