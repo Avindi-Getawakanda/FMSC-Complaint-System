@@ -1,17 +1,8 @@
-
-/* ==========================================
-   FMSC Complaint & Suggestion Management
-   Case Submission Page Styles
-   ========================================== */
-
-/* PAGE LAYOUT */
-
 .case-container {
     width: 100%;
     max-width: 850px;
     margin: 0 auto;
-    padding: 45px 20px 65px;
-    flex: 1;
+    padding: 0 0 24px;
 }
 
 .case-card {
@@ -119,7 +110,7 @@
 }
 
 .form-actions .btn-primary {
-    background: #2459a6;
+    background: var(--university-red);
     color: #ffffff;
     width: auto;
     min-width: 150px;
@@ -131,9 +122,11 @@
     cursor: pointer;
 }
 
+
 .form-actions .btn-primary:hover {
-    background: #1b447f;
+    background: var(--red-hover);
 }
+
 
 .cancel-link {
     color: #637083;
