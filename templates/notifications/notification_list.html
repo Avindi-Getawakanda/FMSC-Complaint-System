@@ -1,0 +1,84 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Notifications | FMSC Feedback Portal{% endblock %}
+
+{% block page_label %}Notifications{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/notifications.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="notifications-page">
+
+    <div class="notifications-header">
+        <div>
+            <h1>My Notifications</h1>
+            <p class="notifications-subtitle">
+                Stay updated on your complaints and suggestions.
+            </p>
+        </div>
+
+        {% if notifications %}
+            <form method="post" action="{% url 'notifications:mark_all_read' %}">
+                {% csrf_token %}
+                <button type="submit" class="notification-button secondary">
+                    Mark All as Read
+                </button>
+            </form>
+        {% endif %}
+    </div>
+
+    <div class="notifications-list">
+        {% for notification in notifications %}
+
+            <div class="notification-card {% if not notification.is_read %}unread{% endif %}">
+
+                <div class="notification-top">
+                    <span class="notification-type">
+                        {{ notification.get_notification_type_display }}
+                    </span>
+
+                    {% if not notification.is_read %}
+                        <span class="notification-badge">New</span>
+                    {% endif %}
+                </div>
+
+                <p class="notification-message">
+                    {{ notification.message }}
+                </p>
+
+                <div class="notification-meta">
+                    <span>Case: {{ notification.case.case_number }}</span>
+                    <span>{{ notification.created_at|date:"d M Y, h:i A" }}</span>
+                </div>
+
+                {% if not notification.is_read %}
+                    <div class="notification-actions">
+                        <form method="post" action="{% url 'notifications:mark_read' notification.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="notification-button">
+                                Mark as Read
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+
+            </div>
+
+        {% empty %}
+
+            <div class="notifications-empty">
+                <h3>No notifications yet</h3>
+                <p>Your case updates will appear here.</p>
+            </div>
+
+        {% endfor %}
+    </div>
+
+</div>
+
+{% endblock %}

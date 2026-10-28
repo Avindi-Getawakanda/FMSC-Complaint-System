@@ -8,6 +8,7 @@ from accounts.models import UserProfile
 
 from .forms import CaseSubmissionForm
 from .models import Attachment, Case
+from notifications.models import Notification
 
 
 @role_required(
@@ -22,6 +23,16 @@ def submit_case(request):
             case = form.save(commit=False)
             case.submitted_by = request.user
             case.save()
+
+            Notification.objects.create(
+                recipient=request.user,
+                case=case,
+                notification_type=Notification.Type.CASE_SUBMITTED,
+                message=(
+                    f"Your {case.get_case_type_display().lower()} "
+                    f"{case.case_number} has been submitted successfully."
+                ),
+            )
 
             uploaded_file = form.cleaned_data.get("attachment")
 
