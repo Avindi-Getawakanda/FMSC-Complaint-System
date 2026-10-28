@@ -1,0 +1,147 @@
+
+body.welcome-page {
+    background: #f5f6f8;
+}
+
+/* Main layout */
+
+.welcome-main {
+    flex: 1;
+}
+
+.welcome-messages {
+    padding-top: 24px;
+}
+
+/* Hero section */
+
+.welcome-hero {
+    min-height: 490px;
+    padding: 65px 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            rgba(20, 10, 15, 0.30),
+            rgba(20, 10, 15, 0.50)
+        ),
+        url("../images/fmsc-hero.jpg")
+        center center / cover no-repeat;
+}
+
+.hero-content {
+    width: 100%;
+    max-width: 720px;
+    padding: 35px 40px;
+
+    background: rgba(30, 12, 20, 0.72);
+    border-radius: 12px;
+
+    color: #ffffff;
+    text-align: center;
+}
+
+.hero-eyebrow {
+    display: block;
+    color: #ffcf79;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.hero-content h1 {
+    margin: 18px 0;
+    color: #ffffff;
+
+    font-size: clamp(30px, 4vw, 46px);
+    line-height: 1.2;
+}
+
+.hero-content p {
+    max-width: 580px;
+    margin: 0 auto 28px;
+
+    color: #f6e9ee;
+    font-size: 15px;
+    line-height: 1.8;
+}
+
+/* Login button */
+
+.portal-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 13px 28px;
+    border-radius: 6px;
+
+    background: #ffffff;
+    color: #a00000;
+
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+
+    transition: background 0.2s ease;
+}
+
+.portal-button:hover {
+    background: #fff1da;
+}
+
+/* Introduction section */
+
+.welcome-intro {
+    padding: 60px 24px;
+    background: #ffffff;
+    text-align: center;
+}
+
+.welcome-intro h2 {
+    margin: 0 0 14px;
+    color: #9b0000;
+    font-size: 26px;
+}
+
+.welcome-intro p {
+    max-width: 620px;
+    margin: 0 auto;
+
+    color: #647080;
+    font-size: 15px;
+    line-height: 1.8;
+}
+
+/* Mobile responsiveness */
+
+@media (max-width: 600px) {
+
+    .welcome-hero {
+        min-height: 420px;
+        padding: 40px 16px;
+    }
+
+    .hero-content {
+        padding: 28px 20px;
+    }
+
+    .hero-content h1 {
+        font-size: 29px;
+    }
+
+    .hero-content p {
+        font-size: 14px;
+    }
+
+    .welcome-intro {
+        padding: 48px 20px;
+    }
+
+    .welcome-intro h2 {
+        font-size: 23px;
+    }
+}
