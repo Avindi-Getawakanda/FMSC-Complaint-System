@@ -4,8 +4,15 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.shortcuts import render, redirect
+from django.views.decorators.cache import never_cache
 
 from .models import UserProfile
+
+def home_view(request):
+    if request.user.is_authenticated:
+        return redirect("dashboard")
+
+    return render(request, "accounts/home.html")
 
 
 def register_view(request):
@@ -43,15 +50,16 @@ def login_view(request):
     return render(request, "accounts/login.html", {"form": form})
 
 
+@never_cache
 def logout_view(request):
     if request.method == "POST":
         logout(request)
         messages.success(request, "You have been logged out.")
-        return redirect("login")
+        return redirect("home")
 
     return redirect("dashboard")
 
-
+@never_cache
 @login_required
 def dashboard_view(request):
     profile, _ = UserProfile.objects.get_or_create(
@@ -62,5 +70,3 @@ def dashboard_view(request):
     return render(request, "accounts/dashboard.html", {
         "profile": profile
     })
-
-

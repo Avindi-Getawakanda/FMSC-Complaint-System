@@ -5,41 +5,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Login | FMSC Feedback Portal</title>
-    <link rel="stylesheet" href="{% static 'css/accounts.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/auth_portal.css' %}">
 </head>
-<body class="auth-page">
 
-    <header class="site-header">
-        <div class="header-content">
-            <div class="brand">
-                <span class="brand-name">FMSC</span>
-                <span class="brand-subtitle">
-                    Complaint & Suggestion Management System
-                </span>
-            </div>
-            <span class="university-name">
-                University of Sri Jayewardenepura
-            </span>
+<body class="portal-auth-page">
+
+    {% include "includes/navbar.html" %}
+
+    <div class="system-bar">
+        <div class="layout system-bar-content">
+            <span class="system-title">FMSC Feedback Portal</span>
+            <span class="system-label">Login</span>
         </div>
-    </header>
+    </div>
 
-    <main class="auth-container">
-        <section class="auth-card">
-            <div class="card-heading">
-                <span class="eyebrow">FMSC FEEDBACK PORTAL</span>
-                <h1>Welcome Back</h1>
-                <p>Sign in to access your account and manage your feedback.</p>
+    <main class="portal-auth-main">
+        <section class="portal-auth-card" aria-labelledby="login-title">
+
+            <div class="portal-auth-heading">
+                <span class="portal-auth-eyebrow">
+                    FMSC FEEDBACK PORTAL
+                </span>
+
+                <h1 id="login-title">Welcome Back</h1>
+
+                <p>
+                    Sign in to access your account and manage your feedback.
+                </p>
             </div>
 
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
+            {% for message in messages %}
+                <div class="alert" role="status">
+                    {{ message }}
+                </div>
+            {% endfor %}
 
             {% if form.non_field_errors %}
-                <div class="alert alert-error">
+                <div class="portal-form-error" role="alert">
                     {{ form.non_field_errors }}
                 </div>
             {% endif %}
@@ -47,35 +53,42 @@
             <form method="post">
                 {% csrf_token %}
 
-                <div class="form-group">
+                <div class="portal-form-group">
                     <label for="{{ form.username.id_for_label }}">
                         Username
                     </label>
                     {{ form.username }}
+
+                    {% for error in form.username.errors %}
+                        <p class="portal-field-error">{{ error }}</p>
+                    {% endfor %}
                 </div>
 
-                <div class="form-group">
+                <div class="portal-form-group">
                     <label for="{{ form.password.id_for_label }}">
                         Password
                     </label>
                     {{ form.password }}
+
+                    {% for error in form.password.errors %}
+                        <p class="portal-field-error">{{ error }}</p>
+                    {% endfor %}
                 </div>
 
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="portal-submit-button">
                     Sign In
                 </button>
             </form>
 
-            <p class="auth-footer">
+            <p class="portal-auth-footer">
                 Don't have an account?
                 <a href="{% url 'register' %}">Create an account</a>
             </p>
+
         </section>
     </main>
 
-    <footer class="site-footer">
-        &copy; FMSC Complaint & Suggestion Management System
-    </footer>
+    {% include "includes/footer.html" %}
 
 </body>
 </html>
