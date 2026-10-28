@@ -17,4 +17,7 @@ urlpatterns = [
 
     # Public welcome page
     path("", account_views.home_view, name="home"),
+
+      # Notifications Module
+    path("notifications/", include("notifications.urls")),
 ]
