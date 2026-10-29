@@ -1,24 +1,32 @@
 from django.urls import path
 
-from . import ageing_views, dashboard_views, views
+from . import (
+    ageing_views,
+    dashboard_views,
+    views,
+    workflow_views,
+)
 
 app_name = "management"
 
 urlpatterns = [
+    path("cases/", views.case_list, name="case_list"),
+    path("cases/<int:pk>/", views.case_detail, name="case_detail"),
+
     path(
-        "cases/",
-        views.case_list,
-        name="case_list",
-    ),
-    path(
-        "cases/<int:pk>/",
-        views.case_detail,
-        name="case_detail",
+        "cases/<int:pk>/review/",
+        workflow_views.case_mark_under_review,
+        name="case_mark_under_review",
     ),
     path(
         "cases/<int:pk>/assign/",
         views.case_assign,
         name="case_assign",
+    ),
+    path(
+        "cases/<int:pk>/reassign/",
+        workflow_views.case_reassign,
+        name="case_reassign",
     ),
     path(
         "cases/<int:pk>/reject/",
@@ -29,6 +37,11 @@ urlpatterns = [
         "cases/<int:pk>/close/",
         views.case_close,
         name="case_close",
+    ),
+    path(
+        "cases/<int:pk>/reopen/",
+        workflow_views.case_reopen,
+        name="case_reopen",
     ),
 
     path(
