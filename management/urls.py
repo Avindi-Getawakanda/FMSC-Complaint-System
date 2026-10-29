@@ -55,4 +55,10 @@ urlpatterns = [
         views.case_resolve,
         name="case_resolve",
     ),
+
+        path(
+        "cases/<int:pk>/close/",
+        views.case_close,
+        name="case_close",
+    ),
 ]

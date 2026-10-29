@@ -145,6 +145,30 @@
 
         {% endif %}
 
+                {% if user.is_superuser or user.profile.role == "administrator" or user.profile.role == "system_admin" %}
+            {% if case.status == "solved" %}
+                <div class="case-actions">
+                    <a
+                        href="{% url 'management:case_close' case.pk %}"
+                        class="management-button"
+                    >
+                        Review and Close Case
+                    </a>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        {% if case.closed_at %}
+            <section class="case-section">
+                <h2>Closure Details</h2>
+
+                <p>
+                    Closed on
+                    {{ case.closed_at|date:"d M Y, h:i A" }}
+                </p>
+            </section>
+        {% endif %}
+
     </article>
 
 {% endblock %}

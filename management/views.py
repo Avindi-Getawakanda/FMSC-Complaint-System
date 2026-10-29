@@ -14,6 +14,7 @@ from .forms import (
     CaseRejectionForm,
     CaseResolutionForm,
     ProgressUpdateForm,
+    CaseClosureForm,
 )
 from .models import Authority, ProgressUpdate
 
@@ -389,14 +390,22 @@ def case_progress_update(request, pk):
         {"case": case, "form": form},
     )
 
-@role_required(UserProfile.Role.AUTHORITY)
+@role_required(
+    UserProfile.Role.AUTHORITY,
+    UserProfile.Role.ADMINISTRATOR,
+    UserProfile.Role.SYSTEM_ADMIN,
+)
 def progress_evidence_download(request, pk):
-    progress = get_object_or_404(
-        ProgressUpdate.objects.select_related("case"),
-        pk=pk,
-        case__assigned_authority__user=request.user,
-        case__assigned_authority__is_active=True,
-    )
+    updates = ProgressUpdate.objects.select_related("case")
+
+    if not request.user.is_superuser:
+        if request.user.profile.role == UserProfile.Role.AUTHORITY:
+            updates = updates.filter(
+                case__assigned_authority__user=request.user,
+                case__assigned_authority__is_active=True,
+            )
+
+    progress = get_object_or_404(updates, pk=pk)
 
     if not progress.evidence:
         raise Http404("No evidence is attached to this update.")
@@ -500,5 +509,90 @@ def case_resolve(request, pk):
             "case": case,
             "form": form,
             "can_resolve": can_resolve,
+        },
+    )
+@role_required(
+    UserProfile.Role.ADMINISTRATOR,
+    UserProfile.Role.SYSTEM_ADMIN,
+)
+@transaction.atomic
+def case_close(request, pk):
+    case = get_object_or_404(
+        Case.objects.select_for_update(),
+        pk=pk,
+    )
+
+    can_close = case.status == Case.Status.SOLVED
+
+    if request.method == "POST":
+        form = CaseClosureForm(request.POST)
+
+        if form.is_valid():
+            if not can_close:
+                form.add_error(
+                    None,
+                    "Only a solved case can be closed.",
+                )
+            else:
+                old_status = case.status
+
+                case.status = Case.Status.CLOSED
+                case.closed_at = timezone.now()
+
+                case.save(
+                    update_fields=[
+                        "status",
+                        "closed_at",
+                        "updated_at",
+                    ]
+                )
+
+                ProgressUpdate.objects.create(
+                    case=case,
+                    comment=(
+                        "Resolution reviewed and case closed "
+                        "by an administrator."
+                    ),
+                    status=Case.Status.CLOSED,
+                    updated_by=request.user,
+                )
+
+                AuditLog.objects.create(
+                    case=case,
+                    actor=request.user,
+                    action="Case closed",
+                    old_value=json.dumps({
+                        "status": old_status,
+                    }),
+                    new_value=json.dumps({
+                        "status": case.status,
+                        "closed_at": case.closed_at.isoformat(),
+                    }),
+                )
+
+                messages.success(
+                    request,
+                    "Case closed successfully.",
+                )
+
+                return redirect(
+                    "management:case_detail",
+                    pk=case.pk,
+                )
+    else:
+        form = CaseClosureForm()
+
+    progress_updates = case.progress_updates.select_related(
+        "updated_by"
+    ).order_by("created_at")
+
+    return render(
+        request,
+        "management/case_close.html",
+        {
+            "case": case,
+            "form": form,
+            "can_close": can_close,
+            "progress_updates": progress_updates,
         },
     )
