@@ -12,6 +12,7 @@ from .forms import (
     AuthorityForm,
     CaseAssignmentForm,
     CaseRejectionForm,
+    CaseResolutionForm,
     ProgressUpdateForm,
 )
 from .models import Authority, ProgressUpdate
@@ -19,6 +20,7 @@ from .models import Authority, ProgressUpdate
 from pathlib import Path
 
 from django.http import FileResponse, Http404
+from django.utils import timezone
 
 
 @role_required(
@@ -413,3 +415,90 @@ def progress_evidence_download(request, pk):
     response["Cache-Control"] = "private, no-store"
 
     return response
+
+@role_required(UserProfile.Role.AUTHORITY)
+@transaction.atomic
+def case_resolve(request, pk):
+    case = get_object_or_404(
+        Case.objects.select_for_update(),
+        pk=pk,
+        assigned_authority__user=request.user,
+        assigned_authority__is_active=True,
+    )
+
+    can_resolve = case.status in {
+        Case.Status.IN_PROGRESS,
+        Case.Status.WAITING_INFO,
+    }
+
+    if request.method == "POST":
+        form = CaseResolutionForm(request.POST)
+
+        if form.is_valid():
+            if not can_resolve:
+                form.add_error(
+                    None,
+                    "This case cannot be marked as solved "
+                    "in its current status.",
+                )
+            else:
+                old_values = {
+                    "status": case.status,
+                    "resolution_note": case.resolution_note,
+                }
+
+                case.resolution_note = form.cleaned_data[
+                    "resolution_note"
+                ]
+                case.status = Case.Status.SOLVED
+                case.solved_at = timezone.now()
+
+                case.save(
+                    update_fields=[
+                        "resolution_note",
+                        "status",
+                        "solved_at",
+                        "updated_at",
+                    ]
+                )
+
+                ProgressUpdate.objects.create(
+                    case=case,
+                    comment=case.resolution_note,
+                    status=Case.Status.SOLVED,
+                    updated_by=request.user,
+                )
+
+                AuditLog.objects.create(
+                    case=case,
+                    actor=request.user,
+                    action="Case marked as solved",
+                    old_value=json.dumps(old_values),
+                    new_value=json.dumps({
+                        "status": case.status,
+                        "resolution_note": case.resolution_note,
+                        "solved_at": case.solved_at.isoformat(),
+                    }),
+                )
+
+                messages.success(
+                    request,
+                    "Case marked as solved successfully.",
+                )
+
+                return redirect(
+                    "management:assigned_case_detail",
+                    pk=case.pk,
+                )
+    else:
+        form = CaseResolutionForm()
+
+    return render(
+        request,
+        "management/case_resolve.html",
+        {
+            "case": case,
+            "form": form,
+            "can_resolve": can_resolve,
+        },
+    )
