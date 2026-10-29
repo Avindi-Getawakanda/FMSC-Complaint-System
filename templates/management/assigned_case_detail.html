@@ -124,6 +124,14 @@
                     <div class="case-description">
                         {{ update.comment|linebreaks }}
                     </div>
+                    {% if update.evidence %}
+                        <a
+                            href="{% url 'management:progress_evidence_download' update.pk %}"
+                            class="case-title-link"
+                        >
+                            Download supporting evidence
+                        </a>
+                    {% endif %}
                 </div>
             {% empty %}
                 <p class="form-introduction">

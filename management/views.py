@@ -16,6 +16,10 @@ from .forms import (
 )
 from .models import Authority, ProgressUpdate
 
+from pathlib import Path
+
+from django.http import FileResponse, Http404
+
 
 @role_required(
     UserProfile.Role.ADMINISTRATOR,
@@ -332,17 +336,22 @@ def case_progress_update(request, pk):
     )
 
     if request.method == "POST":
-        form = ProgressUpdateForm(request.POST, case=case)
+        form = ProgressUpdateForm(
+            request.POST,
+            request.FILES,
+            case=case,
+        )
 
         if form.is_valid():
             old_status = case.status
             new_status = form.cleaned_data["status"]
 
-            ProgressUpdate.objects.create(
+            progress = ProgressUpdate.objects.create(
                 case=case,
                 comment=form.cleaned_data["comment"],
                 status=new_status,
                 updated_by=request.user,
+                evidence=form.cleaned_data.get("evidence"),
             )
 
             case.status = new_status
@@ -353,7 +362,11 @@ def case_progress_update(request, pk):
                 actor=request.user,
                 action="Case progress updated",
                 old_value=json.dumps({"status": old_status}),
-                new_value=json.dumps({"status": new_status}),
+                new_value=json.dumps({
+                    "status": new_status,
+                    "progress_update_id": progress.pk,
+                    "has_evidence": bool(progress.evidence),
+                }),
             )
 
             messages.success(
@@ -373,3 +386,30 @@ def case_progress_update(request, pk):
         "management/case_progress_form.html",
         {"case": case, "form": form},
     )
+
+@role_required(UserProfile.Role.AUTHORITY)
+def progress_evidence_download(request, pk):
+    progress = get_object_or_404(
+        ProgressUpdate.objects.select_related("case"),
+        pk=pk,
+        case__assigned_authority__user=request.user,
+        case__assigned_authority__is_active=True,
+    )
+
+    if not progress.evidence:
+        raise Http404("No evidence is attached to this update.")
+
+    try:
+        evidence_file = progress.evidence.open("rb")
+    except FileNotFoundError:
+        raise Http404("The evidence file could not be found.")
+
+    response = FileResponse(
+        evidence_file,
+        as_attachment=True,
+        filename=Path(progress.evidence.name).name,
+        content_type="application/octet-stream",
+    )
+    response["Cache-Control"] = "private, no-store"
+
+    return response
