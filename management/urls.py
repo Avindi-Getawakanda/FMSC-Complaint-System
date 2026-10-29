@@ -1,14 +1,35 @@
 from django.urls import path
 
-from . import views
+from . import ageing_views, dashboard_views, views
 
 app_name = "management"
 
 urlpatterns = [
-    path("cases/", views.case_list, name="case_list"),
-    path("cases/<int:pk>/", views.case_detail, name="case_detail"),
-    path("cases/<int:pk>/assign/", views.case_assign, name="case_assign"),
-    path("cases/<int:pk>/reject/", views.case_reject, name="case_reject"),
+    path(
+        "cases/",
+        views.case_list,
+        name="case_list",
+    ),
+    path(
+        "cases/<int:pk>/",
+        views.case_detail,
+        name="case_detail",
+    ),
+    path(
+        "cases/<int:pk>/assign/",
+        views.case_assign,
+        name="case_assign",
+    ),
+    path(
+        "cases/<int:pk>/reject/",
+        views.case_reject,
+        name="case_reject",
+    ),
+    path(
+        "cases/<int:pk>/close/",
+        views.case_close,
+        name="case_close",
+    ),
 
     path(
         "authorities/",
@@ -26,50 +47,45 @@ urlpatterns = [
         name="authority_edit",
     ),
 
-        path(
+    path(
         "assigned-cases/",
         views.assigned_case_list,
         name="assigned_case_list",
     ),
-
-        path(
+    path(
         "assigned-cases/<int:pk>/",
         views.assigned_case_detail,
         name="assigned_case_detail",
     ),
-
-        path(
+    path(
         "assigned-cases/<int:pk>/progress/",
         views.case_progress_update,
         name="case_progress_update",
     ),
-
-        path(
+    path(
+        "assigned-cases/<int:pk>/resolve/",
+        views.case_resolve,
+        name="case_resolve",
+    ),
+    path(
         "progress/<int:pk>/evidence/",
         views.progress_evidence_download,
         name="progress_evidence_download",
     ),
 
-        path(
-        "assigned-cases/<int:pk>/resolve/",
-        views.case_resolve,
-        name="case_resolve",
-    ),
-
-        path(
-        "cases/<int:pk>/close/",
-        views.case_close,
-        name="case_close",
-    ),
-
-        path(
+    path(
         "dashboard/",
-        views.management_dashboard,
+        dashboard_views.management_dashboard,
         name="dashboard",
     ),
-        path(
+    path(
         "reports/",
         views.case_report,
         name="case_report",
+    ),
+    path(
+        "reports/ageing/",
+        ageing_views.ageing_report,
+        name="ageing_report",
     ),
 ]
