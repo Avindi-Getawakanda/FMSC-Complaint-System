@@ -1,18 +1,22 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.core.validators import FileExtensionValidator
 from django.db.models import Q
 
 from accounts.models import UserProfile
 from cases.models import Case, Category
 
 from .models import Authority
-from django.core.validators import FileExtensionValidator
 
 
 class CaseAssignmentForm(forms.ModelForm):
     class Meta:
         model = Case
-        fields = ["category", "priority", "assigned_authority"]
+        fields = [
+            "category",
+            "priority",
+            "assigned_authority",
+        ]
 
         labels = {
             "assigned_authority": "Assign to",
@@ -25,12 +29,14 @@ class CaseAssignmentForm(forms.ModelForm):
             is_active=True
         )
 
-        self.fields["assigned_authority"].queryset = Authority.objects.filter(
-            is_active=True
+        self.fields["assigned_authority"].queryset = (
+            Authority.objects.filter(is_active=True)
         )
 
         self.fields["assigned_authority"].required = True
-        self.fields["assigned_authority"].empty_label = "Select an authority"
+        self.fields["assigned_authority"].empty_label = (
+            "Select an authority"
+        )
 
 
 class CaseRejectionForm(forms.ModelForm):
@@ -41,11 +47,15 @@ class CaseRejectionForm(forms.ModelForm):
         widget=forms.Textarea(
             attrs={
                 "rows": 4,
-                "placeholder": "Explain why this case is being rejected.",
+                "placeholder": (
+                    "Explain why this case is being rejected."
+                ),
             }
         ),
         error_messages={
-            "required": "Please provide a reason for rejecting this case.",
+            "required": (
+                "Please provide a reason for rejecting this case."
+            ),
         },
     )
 
@@ -109,15 +119,20 @@ class AuthorityForm(forms.ModelForm):
         self.fields["user"].queryset = available_users.order_by(
             User.USERNAME_FIELD
         )
+
         self.fields["user"].empty_label = "No account linked"
 
     def clean_name(self):
         name = self.cleaned_data["name"].strip()
 
-        existing = Authority.objects.filter(name__iexact=name)
+        existing = Authority.objects.filter(
+            name__iexact=name
+        )
 
         if self.instance.pk:
-            existing = existing.exclude(pk=self.instance.pk)
+            existing = existing.exclude(
+                pk=self.instance.pk
+            )
 
         if existing.exists():
             raise forms.ValidationError(
@@ -126,81 +141,22 @@ class AuthorityForm(forms.ModelForm):
 
         return name
 
-    class ProgressUpdateForm(forms.Form):
-        status = forms.ChoiceField(label="Case status")
-
-    comment = forms.CharField(
-        label="Progress details",
-        strip=True,
-        widget=forms.Textarea(
-            attrs={
-                "rows": 4,
-                "placeholder": "Describe the work completed or next steps.",
-            }
-        ),
-    )
-
-    def __init__(self, *args, case, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        allowed_statuses = {
-            Case.Status.ASSIGNED: [
-                Case.Status.NOT_STARTED,
-                Case.Status.IN_PROGRESS,
-                Case.Status.WAITING_INFO,
-            ],
-            Case.Status.NOT_STARTED: [
-                Case.Status.NOT_STARTED,
-                Case.Status.IN_PROGRESS,
-                Case.Status.WAITING_INFO,
-            ],
-            Case.Status.IN_PROGRESS: [
-                Case.Status.IN_PROGRESS,
-                Case.Status.WAITING_INFO,
-            ],
-            Case.Status.WAITING_INFO: [
-                Case.Status.WAITING_INFO,
-                Case.Status.IN_PROGRESS,
-            ],
-            Case.Status.REOPENED: [
-                Case.Status.IN_PROGRESS,
-                Case.Status.WAITING_INFO,
-            ],
-        }
-
-        available = allowed_statuses.get(case.status, [])
-        labels = dict(Case.Status.choices)
-
-        self.fields["status"].choices = [
-            (status, labels[status])
-            for status in available
-        ]
-
-        self.can_update = bool(available)
-
-        if case.status in available:
-            self.fields["status"].initial = case.status
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        if not self.can_update:
-            raise forms.ValidationError(
-                "Progress cannot be updated in this case's current status."
-            )
-
-        return cleaned_data
 
 class ProgressUpdateForm(forms.Form):
-    status = forms.ChoiceField(label="Case status")
+    status = forms.ChoiceField(
+        label="Case status"
+    )
 
     comment = forms.CharField(
         label="Progress details",
+        required=True,
         strip=True,
         widget=forms.Textarea(
             attrs={
                 "rows": 4,
-                "placeholder": "Describe the work completed or next steps.",
+                "placeholder": (
+                    "Describe the work completed or next steps."
+                ),
             }
         ),
     )
@@ -210,12 +166,21 @@ class ProgressUpdateForm(forms.Form):
         required=False,
         validators=[
             FileExtensionValidator(
-                allowed_extensions=["jpg", "jpeg", "png", "pdf"]
+                allowed_extensions=[
+                    "jpg",
+                    "jpeg",
+                    "png",
+                    "pdf",
+                ]
             )
         ],
-        help_text="Optional. Upload a JPG, PNG or PDF, up to 5 MB.",
+        help_text=(
+            "Optional. Upload a JPG, PNG or PDF, up to 5 MB."
+        ),
         widget=forms.ClearableFileInput(
-            attrs={"accept": ".jpg,.jpeg,.png,.pdf"}
+            attrs={
+                "accept": ".jpg,.jpeg,.png,.pdf",
+            }
         ),
     )
 
@@ -247,7 +212,11 @@ class ProgressUpdateForm(forms.Form):
             ],
         }
 
-        available = allowed_statuses.get(case.status, [])
+        available = allowed_statuses.get(
+            case.status,
+            [],
+        )
+
         labels = dict(Case.Status.choices)
 
         self.fields["status"].choices = [
@@ -282,6 +251,8 @@ class ProgressUpdateForm(forms.Form):
             )
 
         return cleaned_data
+
+
 class CaseResolutionForm(forms.Form):
     resolution_note = forms.CharField(
         label="Resolution details",
@@ -297,23 +268,34 @@ class CaseResolutionForm(forms.Form):
             }
         ),
         error_messages={
-            "required": "Please explain how the case was resolved.",
+            "required": (
+                "Please explain how the case was resolved."
+            ),
         },
     )
 
+
 class CaseClosureForm(forms.Form):
     confirm = forms.BooleanField(
-        label="I have reviewed the resolution and approve closing this case.",
+        label=(
+            "I have reviewed the resolution and approve "
+            "closing this case."
+        ),
         required=True,
         error_messages={
-            "required": "Please confirm that you reviewed the resolution.",
+            "required": (
+                "Please confirm that you reviewed the resolution."
+            ),
         },
     )
+
 
 class CaseReportFilterForm(forms.Form):
     status = forms.ChoiceField(
         required=False,
-        choices=[("", "All statuses")] + list(Case.Status.choices),
+        choices=[
+            ("", "All statuses"),
+        ] + list(Case.Status.choices),
     )
 
     category = forms.ModelChoiceField(
@@ -331,13 +313,21 @@ class CaseReportFilterForm(forms.Form):
     date_from = forms.DateField(
         label="Submitted from",
         required=False,
-        widget=forms.DateInput(attrs={"type": "date"}),
+        widget=forms.DateInput(
+            attrs={
+                "type": "date",
+            }
+        ),
     )
 
     date_to = forms.DateField(
         label="Submitted to",
         required=False,
-        widget=forms.DateInput(attrs={"type": "date"}),
+        widget=forms.DateInput(
+            attrs={
+                "type": "date",
+            }
+        ),
     )
 
     def clean(self):
@@ -346,7 +336,11 @@ class CaseReportFilterForm(forms.Form):
         date_from = cleaned_data.get("date_from")
         date_to = cleaned_data.get("date_to")
 
-        if date_from and date_to and date_from > date_to:
+        if (
+            date_from
+            and date_to
+            and date_from > date_to
+        ):
             self.add_error(
                 "date_to",
                 "The end date must be on or after the start date.",

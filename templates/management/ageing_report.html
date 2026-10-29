@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Ageing Report | FMSC Feedback Portal{% endblock %}
+
+{% block page_label %}Case Ageing Report{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/management.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+
+    <div class="management-heading">
+
+        <a
+            href="{% url 'management:dashboard' %}"
+            class="back-link"
+        >
+            &larr; Back to management overview
+        </a>
+
+        <h1>Case Ageing Report</h1>
+
+        <p>
+            Monitor assigned and not-started cases,
+            ordered from oldest to newest.
+        </p>
+
+    </div>
+
+    <div class="dashboard-notice">
+        <p>
+            <strong>
+                Report date: {{ today|date:"d M Y" }}
+            </strong>
+        </p>
+
+        <p>
+            Age is the number of calendar days since submission.
+            Cases submitted today have an age of 0 days.
+            This report includes Assigned and Not Started statuses.
+        </p>
+    </div>
+
+    <section class="case-panel report-filter-panel">
+        <h2>Ageing Filters</h2>
+
+        <form
+            method="get"
+            action="{% url 'management:ageing_report' %}"
+            class="management-form"
+        >
+
+            {% if form.non_field_errors %}
+                <div class="form-error-summary" role="alert">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="report-filter-grid">
+                {% for field in form %}
+                    <div class="form-group">
+
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
+
+                        {{ field }}
+
+                        {% for error in field.errors %}
+                            <p class="form-error" role="alert">
+                                {{ error }}
+                            </p>
+                        {% endfor %}
+
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="case-actions">
+
+                <button type="submit" class="management-button">
+                    Apply Filters
+                </button>
+
+                <a
+                    href="{% url 'management:ageing_report' %}"
+                    class="management-button management-button-outline"
+                >
+                    Reset
+                </a>
+
+            </div>
+
+        </form>
+    </section>
+
+    {% if filters_valid %}
+        <p class="report-results-heading">
+            <strong>{{ total }}</strong>
+            matching case{{ total|pluralize }}.
+        </p>
+    {% else %}
+        <p class="report-results-heading" role="alert">
+            Correct the filter errors to view results.
+        </p>
+    {% endif %}
+
+    <section class="case-list-panel" aria-label="Case ageing results">
+        <div
+            class="table-scroll"
+            role="region"
+            aria-label="Cases awaiting action"
+            tabindex="0"
+        >
+            <table class="case-table">
+
+                <caption>Cases Awaiting Action</caption>
+
+                <thead>
+                    <tr>
+                        <th scope="col">Case Number</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Priority</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Authority</th>
+                        <th scope="col">Submitted</th>
+                        <th scope="col">Age in Days</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+
+                            <td class="case-reference">
+                                {{ row.case.case_number }}
+                            </td>
+
+                            <td>
+                                <a
+                                    href="{% url 'management:case_detail' row.case.pk %}"
+                                    class="case-title-link"
+                                >
+                                    {{ row.case.title }}
+                                </a>
+                            </td>
+
+                            <td>
+                                <span
+                                    {% if row.case.priority == "urgent" %}
+                                        class="priority-urgent"
+                                    {% endif %}
+                                >
+                                    {{ row.case.get_priority_display }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="status-badge status-{{ row.case.status }}">
+                                    {{ row.case.get_status_display }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {{ row.case.assigned_authority.name|default:"Unassigned" }}
+                            </td>
+
+                            <td>
+                                {{ row.case.created_at|date:"d M Y" }}
+                            </td>
+
+                            <td>
+                                <strong>{{ row.age_days }}</strong>
+                            </td>
+
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                {% if filters_valid %}
+                                    No assigned or not-started cases
+                                    match these filters.
+                                {% else %}
+                                    Results will appear after the
+                                    filter errors are corrected.
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </section>
+
+    {% if page_obj.has_other_pages %}
+        <nav class="report-pagination" aria-label="Ageing report pages">
+
+            {% if page_obj.has_previous %}
+                <a
+                    href="?{{ filter_query }}&amp;page={{ page_obj.previous_page_number }}"
+                    class="case-title-link"
+                >
+                    &larr; Previous
+                </a>
+            {% endif %}
+
+            <span>
+                Page {{ page_obj.number }}
+                of {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+                <a
+                    href="?{{ filter_query }}&amp;page={{ page_obj.next_page_number }}"
+                    class="case-title-link"
+                >
+                    Next &rarr;
+                </a>
+            {% endif %}
+
+        </nav>
+    {% endif %}
+
+{% endblock %}

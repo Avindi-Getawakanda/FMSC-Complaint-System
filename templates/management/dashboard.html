@@ -15,7 +15,6 @@
 {% block content %}
 
     <div class="management-heading">
-
         <a href="{% url 'dashboard' %}" class="back-link">
             &larr; Back to dashboard
         </a>
@@ -23,167 +22,340 @@
         <h1>Management Overview</h1>
 
         <p>
-            Current case statistics across faculty complaints
-            and suggestions.
+            Monitor faculty cases, pending work and resolution
+            performance.
         </p>
 
-        <div class="management-heading-actions">
-         <a  href="{% url 'management:case_list' %}" class="management-button">
-        View All Cases
-         </a>
+        <div class="case-actions">
+            <a
+                href="{% url 'management:case_list' %}"
+                class="management-button"
+            >
+                View All Cases
+            </a>
 
-        <a href="{% url 'management:case_report' %}" class="management-button management-button-outline">
-        Case Reports
-         </a>
+            <a
+                href="{% url 'management:case_report' %}"
+                class="management-button management-button-outline"
+            >
+                Case Reports
+            </a>
+
+            <a
+                href="{% url 'management:ageing_report' %}"
+                class="management-button management-button-outline"
+            >
+                Ageing Report
+            </a>
         </div>
-
     </div>
 
-    <section class="statistics-grid" aria-label="Case statistics">
+    <section class="case-panel report-filter-panel">
+        <h2>Reporting Period</h2>
 
-        <article class="stat-card">
-            <h2 class="stat-label">Total Cases</h2>
-            <p class="stat-value">{{ stats.total }}</p>
-        </article>
+        <form
+            method="get"
+            action="{% url 'management:dashboard' %}"
+            class="management-form"
+        >
+            <div class="report-filter-grid">
+                {% for field in form %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
 
-        <article class="stat-card stat-card-gold">
-            <h2 class="stat-label">Open Cases</h2>
-            <p class="stat-value">{{ stats.open }}</p>
-        </article>
+                        {{ field }}
 
-        <article class="stat-card stat-card-slate">
-            <h2 class="stat-label">In Progress</h2>
-            <p class="stat-value">{{ stats.in_progress }}</p>
-        </article>
+                        {% for error in field.errors %}
+                            <p class="form-error" role="alert">
+                                {{ error }}
+                            </p>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
 
-        <article class="stat-card stat-card-gold">
-            <h2 class="stat-label">Solved — Awaiting Closure</h2>
-            <p class="stat-value">{{ stats.solved }}</p>
-        </article>
+            <p class="form-help">
+                Statistics use cases submitted within this period
+                and show their current status. Leave dates empty
+                to include all submissions.
+            </p>
 
-        <article class="stat-card stat-card-slate">
-            <h2 class="stat-label">Closed Cases</h2>
-            <p class="stat-value">{{ stats.closed }}</p>
-        </article>
+            <div class="case-actions">
+                <button type="submit" class="management-button">
+                    Apply Period
+                </button>
 
-        <article class="stat-card">
-            <h2 class="stat-label">Rejected Cases</h2>
-            <p class="stat-value">{{ stats.rejected }}</p>
-        </article>
-
+                <a
+                    href="{% url 'management:dashboard' %}"
+                    class="management-button management-button-outline"
+                >
+                    Reset
+                </a>
+            </div>
+        </form>
     </section>
 
-    <div class="dashboard-notice">
-        <p>
-            <strong>Urgent open cases: {{ stats.urgent_open }}</strong>
+    {% if filters_valid %}
+
+        <section class="statistics-grid" aria-label="Case statistics">
+            {% for metric in metrics %}
+                <article class="stat-card {{ metric.style }}">
+                    <h2 class="stat-label">{{ metric.label }}</h2>
+                    <p class="stat-value">{{ metric.value }}</p>
+                </article>
+            {% endfor %}
+        </section>
+
+        <div class="dashboard-notice">
+            <p>
+                <strong>
+                    Urgent cases pending action:
+                    {{ stats.urgent_pending }}
+                </strong>
+            </p>
+
+            <p>
+                Attempted means the case has moved beyond Submitted.
+                Not Started / Assigned combines those two statuses.
+            </p>
+
+            <p>
+                Open follows the proposal’s definition: every status
+                except Closed, including Solved and Rejected.
+                Pending Action excludes Solved, Closed and Rejected.
+            </p>
+        </div>
+
+        <section class="statistics-grid" aria-label="Performance summary">
+
+            <article class="stat-card">
+                <h2 class="stat-label">Complaints</h2>
+                <p class="stat-value">{{ stats.complaints }}</p>
+            </article>
+
+            <article class="stat-card stat-card-gold">
+                <h2 class="stat-label">Suggestions</h2>
+                <p class="stat-value">{{ stats.suggestions }}</p>
+            </article>
+
+            <article class="stat-card stat-card-slate">
+                <h2 class="stat-label">Solved or Closed Share</h2>
+                <p class="stat-value">
+                    {{ resolution_rate|floatformat:1 }}%
+                </p>
+            </article>
+
+            <article class="stat-card stat-card-gold">
+                <h2 class="stat-label">Average Resolution Days</h2>
+
+                <p class="stat-value">
+                    {% if average_resolution_days != None %}
+                        {{ average_resolution_days|floatformat:1 }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </p>
+
+                <p class="form-help">
+                    Submission to solved date, or closure date
+                    when a solved date is unavailable.
+                    Includes currently Solved or Closed cases
+                    with valid dates.
+                </p>
+            </article>
+
+        </section>
+
+        <section class="case-list-panel dashboard-table-section">
+            <div
+                class="table-scroll"
+                role="region"
+                aria-label="Authority pending workload"
+                tabindex="0"
+            >
+                <table class="case-table">
+                    <caption>Authority-wise Pending Workload</caption>
+
+                    <thead>
+                        <tr>
+                            <th scope="col">Authority</th>
+                            <th scope="col">Total Pending</th>
+                            <th scope="col">Assigned</th>
+                            <th scope="col">Not Started</th>
+                            <th scope="col">In Progress</th>
+                            <th scope="col">Waiting for Information</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for item in authority_summary %}
+                            <tr>
+                                <td>
+                                    {{ item.assigned_authority__name|default:"Unassigned" }}
+                                </td>
+                                <td><strong>{{ item.total }}</strong></td>
+                                <td>{{ item.assigned }}</td>
+                                <td>{{ item.not_started }}</td>
+                                <td>{{ item.in_progress }}</td>
+                                <td>{{ item.waiting_info }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="empty-state">
+                                    No cases are pending action
+                                    within the selected submission period.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <p class="form-help">
+            Total Pending also includes Submitted, Under Review
+            and Reopened cases where applicable.
         </p>
 
-        <p>
-            Open cases include those awaiting review, assignment,
-            work or further information. In Progress is included
-            in the open total.
-        </p>
-    </div>
+        <section class="case-list-panel dashboard-table-section">
+            <div
+                class="table-scroll"
+                role="region"
+                aria-label="Category summary"
+                tabindex="0"
+            >
+                <table class="case-table">
+                    <caption>Cases by Category</caption>
 
-    <section class="case-list-panel" aria-label="Status summary">
-        <div
-            class="table-scroll"
-            role="region"
-            aria-label="Cases by status"
-            tabindex="0"
-        >
-            <table class="case-table">
-
-                <caption>Cases by Status</caption>
-
-                <thead>
-                    <tr>
-                        <th scope="col">Status</th>
-                        <th scope="col">Number of Cases</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {% for item in status_summary %}
+                    <thead>
                         <tr>
-                            <td>
-                                <span class="status-badge status-{{ item.value }}">
-                                    {{ item.label }}
-                                </span>
-                            </td>
-
-                            <td>{{ item.total }}</td>
+                            <th scope="col">Category</th>
+                            <th scope="col">Number of Cases</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
+                    </thead>
 
-            </table>
+                    <tbody>
+                        {% for item in category_summary %}
+                            <tr>
+                                <td>{{ item.category__name }}</td>
+                                <td>{{ item.total }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="2" class="empty-state">
+                                    No cases in the selected period.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="case-list-panel dashboard-table-section">
+            <div
+                class="table-scroll"
+                role="region"
+                aria-label="Status summary"
+                tabindex="0"
+            >
+                <table class="case-table">
+                    <caption>Cases by Status</caption>
+
+                    <thead>
+                        <tr>
+                            <th scope="col">Status</th>
+                            <th scope="col">Number of Cases</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for item in status_summary %}
+                            <tr>
+                                <td>
+                                    <span class="status-badge status-{{ item.value }}">
+                                        {{ item.label }}
+                                    </span>
+                                </td>
+                                <td>{{ item.total }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="case-list-panel dashboard-table-section">
+            <div
+                class="table-scroll"
+                role="region"
+                aria-label="Recent cases"
+                tabindex="0"
+            >
+                <table class="case-table">
+                    <caption>Five Most Recent Cases in Selected Period</caption>
+
+                    <thead>
+                        <tr>
+                            <th scope="col">Case Number</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Submitted</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for case in recent_cases %}
+                            <tr>
+                                <td class="case-reference">
+                                    {{ case.case_number }}
+                                </td>
+
+                                <td>
+                                    <a
+                                        href="{% url 'management:case_detail' case.pk %}"
+                                        class="case-title-link"
+                                    >
+                                        {{ case.title }}
+                                    </a>
+                                </td>
+
+                                <td>{{ case.category.name }}</td>
+
+                                <td>
+                                    <span class="status-badge status-{{ case.status }}">
+                                        {{ case.get_status_display }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {{ case.created_at|date:"d M Y" }}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="empty-state">
+                                    No cases in the selected period.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    {% else %}
+
+        <div class="form-error-summary" role="alert">
+            <p>
+                Correct the date errors above to display
+                dashboard statistics.
+            </p>
         </div>
-    </section>
 
-    <section
-        class="case-list-panel dashboard-table-section"
-        aria-label="Recent cases"
-    >
-        <div
-            class="table-scroll"
-            role="region"
-            aria-label="Five most recent cases"
-            tabindex="0"
-        >
-            <table class="case-table">
-
-                <caption>Five Most Recent Cases</caption>
-
-                <thead>
-                    <tr>
-                        <th scope="col">Case Number</th>
-                        <th scope="col">Title</th>
-                        <th scope="col">Category</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Submitted</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {% for case in recent_cases %}
-                        <tr>
-                            <td class="case-reference">
-                                {{ case.case_number }}
-                            </td>
-
-                            <td>
-                                <a
-                                    href="{% url 'management:case_detail' case.pk %}"
-                                    class="case-title-link"
-                                >
-                                    {{ case.title }}
-                                </a>
-                            </td>
-
-                            <td>{{ case.category.name }}</td>
-
-                            <td>
-                                <span class="status-badge status-{{ case.status }}">
-                                    {{ case.get_status_display }}
-                                </span>
-                            </td>
-
-                            <td>
-                                {{ case.created_at|date:"d M Y" }}
-                            </td>
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td colspan="5" class="empty-state">
-                                No cases have been submitted yet.
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-
-            </table>
-        </div>
-    </section>
+    {% endif %}
 
 {% endblock %}
