@@ -1,4 +1,8 @@
 import json
+import csv
+
+from django.core.paginator import Paginator
+from django.http import HttpResponse
 
 from django.contrib import messages
 from accounts.decorators import role_required
@@ -15,6 +19,7 @@ from .forms import (
     CaseResolutionForm,
     ProgressUpdateForm,
     CaseClosureForm,
+    CaseReportFilterForm
 )
 from .models import Authority, ProgressUpdate
 
@@ -58,12 +63,23 @@ def case_detail(request, pk):
         pk=pk,
     )
 
+    progress_updates = case.progress_updates.select_related(
+        "updated_by"
+    ).order_by("created_at", "pk")
+
+    audit_logs = case.audit_logs.select_related(
+        "actor"
+    ).order_by("created_at", "pk")
+
     return render(
         request,
         "management/case_detail.html",
-        {"case": case},
+        {
+            "case": case,
+            "progress_updates": progress_updates,
+            "audit_logs": audit_logs,
+        },
     )
-
 @role_required(
     UserProfile.Role.ADMINISTRATOR,
     UserProfile.Role.SYSTEM_ADMIN,
@@ -676,5 +692,127 @@ def management_dashboard(request):
             "stats": stats,
             "status_summary": status_summary,
             "recent_cases": recent_cases,
+        },
+    )
+@role_required(
+    UserProfile.Role.ADMINISTRATOR,
+    UserProfile.Role.SYSTEM_ADMIN,
+    UserProfile.Role.MANAGEMENT,
+)
+def case_report(request):
+    form = CaseReportFilterForm(request.GET)
+
+    cases = Case.objects.select_related(
+        "category",
+        "assigned_authority",
+    ).order_by("-created_at", "-pk")
+
+    filters_valid = form.is_valid()
+
+    if filters_valid:
+        filters = form.cleaned_data
+
+        if filters["status"]:
+            cases = cases.filter(status=filters["status"])
+
+        if filters["category"]:
+            cases = cases.filter(category=filters["category"])
+
+        if filters["authority"]:
+            cases = cases.filter(
+                assigned_authority=filters["authority"]
+            )
+
+        if filters["date_from"]:
+            cases = cases.filter(
+                created_at__date__gte=filters["date_from"]
+            )
+
+        if filters["date_to"]:
+            cases = cases.filter(
+                created_at__date__lte=filters["date_to"]
+            )
+    else:
+        cases = cases.none()
+
+    if request.GET.get("export") == "csv" and filters_valid:
+        response = HttpResponse(
+            content_type="text/csv; charset=utf-8"
+        )
+        response["Content-Disposition"] = (
+            'attachment; filename="fmsc-case-report.csv"'
+        )
+
+        # Helps spreadsheet applications recognise UTF-8.
+        response.write("\ufeff")
+
+        writer = csv.writer(response)
+
+        writer.writerow([
+            "Case Number",
+            "Title",
+            "Type",
+            "Category",
+            "Priority",
+            "Status",
+            "Authority",
+            "Submitted On",
+            "Solved On",
+            "Closed On",
+        ])
+
+        def safe_cell(value):
+            text = str(value) if value is not None else ""
+
+            # Prevent case text being interpreted as a spreadsheet formula.
+            if text.lstrip().startswith(("=", "+", "-", "@")):
+                return "'" + text
+
+            return text
+
+        def display_date(value):
+            if not value:
+                return ""
+
+            return timezone.localtime(value).strftime(
+                "%Y-%m-%d %H:%M"
+            )
+
+        for case in cases.iterator(chunk_size=500):
+            writer.writerow([
+                safe_cell(case.case_number),
+                safe_cell(case.title),
+                safe_cell(case.get_case_type_display()),
+                safe_cell(case.category.name),
+                safe_cell(case.get_priority_display()),
+                safe_cell(case.get_status_display()),
+                safe_cell(
+                    case.assigned_authority.name
+                    if case.assigned_authority
+                    else "Unassigned"
+                ),
+                display_date(case.created_at),
+                display_date(case.solved_at),
+                display_date(case.closed_at),
+            ])
+
+        return response
+
+    paginator = Paginator(cases, 25)
+    page_obj = paginator.get_page(request.GET.get("page"))
+
+    parameters = request.GET.copy()
+    parameters.pop("page", None)
+    parameters.pop("export", None)
+
+    return render(
+        request,
+        "management/case_report.html",
+        {
+            "form": form,
+            "filters_valid": filters_valid,
+            "page_obj": page_obj,
+            "total": paginator.count,
+            "filter_query": parameters.urlencode(),
         },
     )

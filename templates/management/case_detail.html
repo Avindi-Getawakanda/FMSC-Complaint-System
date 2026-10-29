@@ -157,6 +157,24 @@
                 </div>
             {% endif %}
         {% endif %}
+    
+
+                {% if case.resolution_note %}
+            <section class="case-section">
+                <h2>Resolution Details</h2>
+
+                <div class="case-description">
+                    {{ case.resolution_note|linebreaks }}
+                </div>
+
+                {% if case.solved_at %}
+                    <p class="form-help">
+                        Solved on
+                        {{ case.solved_at|date:"d M Y, h:i A" }}
+                    </p>
+                {% endif %}
+            </section>
+        {% endif %}
 
         {% if case.closed_at %}
             <section class="case-section">
@@ -168,6 +186,92 @@
                 </p>
             </section>
         {% endif %}
+
+                <section class="case-section">
+            <h2>Progress History</h2>
+
+            {% for update in progress_updates %}
+                <div class="case-section">
+
+                    <span class="status-badge status-{{ update.status }}">
+                        {{ update.get_status_display }}
+                    </span>
+
+                    <p class="form-help">
+                        {{ update.created_at|date:"d M Y, h:i A" }}
+                        &middot;
+                        {{ update.updated_by.username|default:"Deleted account" }}
+                    </p>
+
+                    <div class="case-description">
+                        {{ update.comment|linebreaks }}
+                    </div>
+
+                    {% if update.evidence %}
+                        {% if user.is_superuser or user.profile.role == "administrator" or user.profile.role == "system_admin" %}
+                            <a
+                                href="{% url 'management:progress_evidence_download' update.pk %}"
+                                class="case-title-link"
+                            >
+                                Download supporting evidence
+                            </a>
+                        {% else %}
+                            <p class="form-help">
+                                Supporting evidence attached.
+                            </p>
+                        {% endif %}
+                    {% endif %}
+
+                </div>
+            {% empty %}
+                <p class="form-introduction">
+                    No progress updates have been recorded yet.
+                </p>
+            {% endfor %}
+        </section>
+
+        <section class="case-section">
+            <h2>Activity Log</h2>
+
+            <div
+                class="table-scroll"
+                role="region"
+                aria-label="Case activity log"
+                tabindex="0"
+            >
+                <table class="case-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Date and Time</th>
+                            <th scope="col">Action</th>
+                            <th scope="col">Performed By</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td>
+                                {{ case.created_at|date:"d M Y, h:i A" }}
+                            </td>
+                            <td>Case submitted</td>
+                            <td>{{ case.submitted_by.username }}</td>
+                        </tr>
+
+                        {% for log in audit_logs %}
+                            <tr>
+                                <td>
+                                    {{ log.created_at|date:"d M Y, h:i A" }}
+                                </td>
+                                <td>{{ log.action }}</td>
+                                <td>
+                                    {{ log.actor.username|default:"Deleted account" }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
     </article>
 

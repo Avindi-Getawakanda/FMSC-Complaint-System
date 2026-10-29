@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Case Reports | FMSC Feedback Portal{% endblock %}
+
+{% block page_label %}Case Reports{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/management.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+
+    <div class="management-heading">
+        <a
+            href="{% url 'management:dashboard' %}"
+            class="back-link"
+        >
+            &larr; Back to management overview
+        </a>
+
+        <h1>Case Reports</h1>
+
+        <p>
+            Filter cases and download the matching results
+            as a CSV file.
+        </p>
+    </div>
+
+    <section class="case-panel report-filter-panel">
+        <h2>Report Filters</h2>
+
+        <form
+            method="get"
+            action="{% url 'management:case_report' %}"
+            class="management-form"
+        >
+
+            {% if form.non_field_errors %}
+                <div class="form-error-summary" role="alert">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="report-filter-grid">
+                {% for field in form %}
+                    <div class="form-group">
+
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
+
+                        {{ field }}
+
+                        {% for error in field.errors %}
+                            <p class="form-error" role="alert">
+                                {{ error }}
+                            </p>
+                        {% endfor %}
+
+                    </div>
+                {% endfor %}
+            </div>
+
+            <p class="form-help">
+                Dates refer to when the case was submitted.
+                Both selected dates are included.
+            </p>
+
+            <div class="case-actions">
+
+                <button type="submit" class="management-button">
+                    Apply Filters
+                </button>
+
+                <button
+                    type="submit"
+                    name="export"
+                    value="csv"
+                    class="management-button management-button-outline"
+                >
+                    Export CSV
+                </button>
+
+                <a
+                    href="{% url 'management:case_report' %}"
+                    class="management-button management-button-outline"
+                >
+                    Reset
+                </a>
+
+            </div>
+
+        </form>
+    </section>
+
+    {% if filters_valid %}
+        <p class="report-results-heading">
+            <strong>{{ total }}</strong>
+            matching case{{ total|pluralize }}.
+            CSV export includes all matching results.
+        </p>
+    {% else %}
+        <p class="report-results-heading" role="alert">
+            Correct the filter errors above to view or export results.
+        </p>
+    {% endif %}
+
+    <section class="case-list-panel" aria-label="Report results">
+        <div
+            class="table-scroll"
+            role="region"
+            aria-label="Filtered cases"
+            tabindex="0"
+        >
+            <table class="case-table">
+
+                <caption>Case Report Results</caption>
+
+                <thead>
+                    <tr>
+                        <th scope="col">Case Number</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Priority</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Authority</th>
+                        <th scope="col">Submitted</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for case in page_obj %}
+                        <tr>
+
+                            <td class="case-reference">
+                                {{ case.case_number }}
+                            </td>
+
+                            <td>
+                                <a
+                                    href="{% url 'management:case_detail' case.pk %}"
+                                    class="case-title-link"
+                                >
+                                    {{ case.title }}
+                                </a>
+                            </td>
+
+                            <td>{{ case.category.name }}</td>
+
+                            <td>
+                                <span
+                                    {% if case.priority == "urgent" %}
+                                        class="priority-urgent"
+                                    {% endif %}
+                                >
+                                    {{ case.get_priority_display }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="status-badge status-{{ case.status }}">
+                                    {{ case.get_status_display }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {{ case.assigned_authority.name|default:"Unassigned" }}
+                            </td>
+
+                            <td>
+                                {{ case.created_at|date:"d M Y" }}
+                            </td>
+
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                {% if filters_valid %}
+                                    No cases match the selected filters.
+                                {% else %}
+                                    Results will appear after the
+                                    filter errors are corrected.
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </section>
+
+    {% if page_obj.has_other_pages %}
+        <nav class="report-pagination" aria-label="Report pages">
+
+            {% if page_obj.has_previous %}
+                <a
+                    href="?{{ filter_query }}&amp;page={{ page_obj.previous_page_number }}"
+                    class="case-title-link"
+                >
+                    &larr; Previous
+                </a>
+            {% endif %}
+
+            <span>
+                Page {{ page_obj.number }}
+                of {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+                <a
+                    href="?{{ filter_query }}&amp;page={{ page_obj.next_page_number }}"
+                    class="case-title-link"
+                >
+                    Next &rarr;
+                </a>
+            {% endif %}
+
+        </nav>
+    {% endif %}
+
+{% endblock %}

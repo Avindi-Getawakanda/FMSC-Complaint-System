@@ -309,3 +309,47 @@ class CaseClosureForm(forms.Form):
             "required": "Please confirm that you reviewed the resolution.",
         },
     )
+
+class CaseReportFilterForm(forms.Form):
+    status = forms.ChoiceField(
+        required=False,
+        choices=[("", "All statuses")] + list(Case.Status.choices),
+    )
+
+    category = forms.ModelChoiceField(
+        queryset=Category.objects.all(),
+        required=False,
+        empty_label="All categories",
+    )
+
+    authority = forms.ModelChoiceField(
+        queryset=Authority.objects.all(),
+        required=False,
+        empty_label="All authorities",
+    )
+
+    date_from = forms.DateField(
+        label="Submitted from",
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+
+    date_to = forms.DateField(
+        label="Submitted to",
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        date_from = cleaned_data.get("date_from")
+        date_to = cleaned_data.get("date_to")
+
+        if date_from and date_to and date_from > date_to:
+            self.add_error(
+                "date_to",
+                "The end date must be on or after the start date.",
+            )
+
+        return cleaned_data
