@@ -65,7 +65,14 @@
                                     {{ case.case_number }}
                                 </td>
 
-                                <td>{{ case.title }}</td>
+                                <td>
+                                    <a
+                                        href="{% url 'management:assigned_case_detail' case.pk %}"
+                                        class="case-title-link"
+                                    >
+                                        {{ case.title }}
+                                    </a>
+                                </td>
 
                                 <td>{{ case.category.name }}</td>
 

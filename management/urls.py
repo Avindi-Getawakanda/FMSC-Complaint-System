@@ -31,4 +31,16 @@ urlpatterns = [
         views.assigned_case_list,
         name="assigned_case_list",
     ),
+
+        path(
+        "assigned-cases/<int:pk>/",
+        views.assigned_case_detail,
+        name="assigned_case_detail",
+    ),
+
+        path(
+        "assigned-cases/<int:pk>/progress/",
+        views.case_progress_update,
+        name="case_progress_update",
+    ),
 ]
