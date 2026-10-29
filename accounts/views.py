@@ -2,11 +2,12 @@
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
 
 from .models import UserProfile
+from .forms import CustomRegistrationForm
 
 def home_view(request):
     if request.user.is_authenticated:
@@ -14,19 +15,19 @@ def home_view(request):
 
     return render(request, "accounts/home.html")
 
-
 def register_view(request):
     if request.user.is_authenticated:
         return redirect("dashboard")
 
-    form = UserCreationForm(request.POST or None)
+    form = CustomRegistrationForm(request.POST or None)
 
     if request.method == "POST" and form.is_valid():
         user = form.save()
 
         UserProfile.objects.create(
             user=user,
-            role=UserProfile.Role.STUDENT
+            role=form.cleaned_data["role"],
+            department=form.cleaned_data["department"]
         )
 
         login(request, user)
@@ -34,7 +35,6 @@ def register_view(request):
         return redirect("dashboard")
 
     return render(request, "accounts/register.html", {"form": form})
-
 
 def login_view(request):
     if request.user.is_authenticated:
