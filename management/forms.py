@@ -124,3 +124,133 @@ class AuthorityForm(forms.ModelForm):
             )
 
         return name
+
+    class ProgressUpdateForm(forms.Form):
+        status = forms.ChoiceField(label="Case status")
+
+    comment = forms.CharField(
+        label="Progress details",
+        strip=True,
+        widget=forms.Textarea(
+            attrs={
+                "rows": 4,
+                "placeholder": "Describe the work completed or next steps.",
+            }
+        ),
+    )
+
+    def __init__(self, *args, case, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        allowed_statuses = {
+            Case.Status.ASSIGNED: [
+                Case.Status.NOT_STARTED,
+                Case.Status.IN_PROGRESS,
+                Case.Status.WAITING_INFO,
+            ],
+            Case.Status.NOT_STARTED: [
+                Case.Status.NOT_STARTED,
+                Case.Status.IN_PROGRESS,
+                Case.Status.WAITING_INFO,
+            ],
+            Case.Status.IN_PROGRESS: [
+                Case.Status.IN_PROGRESS,
+                Case.Status.WAITING_INFO,
+            ],
+            Case.Status.WAITING_INFO: [
+                Case.Status.WAITING_INFO,
+                Case.Status.IN_PROGRESS,
+            ],
+            Case.Status.REOPENED: [
+                Case.Status.IN_PROGRESS,
+                Case.Status.WAITING_INFO,
+            ],
+        }
+
+        available = allowed_statuses.get(case.status, [])
+        labels = dict(Case.Status.choices)
+
+        self.fields["status"].choices = [
+            (status, labels[status])
+            for status in available
+        ]
+
+        self.can_update = bool(available)
+
+        if case.status in available:
+            self.fields["status"].initial = case.status
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if not self.can_update:
+            raise forms.ValidationError(
+                "Progress cannot be updated in this case's current status."
+            )
+
+        return cleaned_data
+
+class ProgressUpdateForm(forms.Form):
+    status = forms.ChoiceField(label="Case status")
+
+    comment = forms.CharField(
+        label="Progress details",
+        strip=True,
+        widget=forms.Textarea(
+            attrs={
+                "rows": 4,
+                "placeholder": "Describe the work completed or next steps.",
+            }
+        ),
+    )
+
+    def __init__(self, *args, case, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        allowed_statuses = {
+            Case.Status.ASSIGNED: [
+                Case.Status.NOT_STARTED,
+                Case.Status.IN_PROGRESS,
+                Case.Status.WAITING_INFO,
+            ],
+            Case.Status.NOT_STARTED: [
+                Case.Status.NOT_STARTED,
+                Case.Status.IN_PROGRESS,
+                Case.Status.WAITING_INFO,
+            ],
+            Case.Status.IN_PROGRESS: [
+                Case.Status.IN_PROGRESS,
+                Case.Status.WAITING_INFO,
+            ],
+            Case.Status.WAITING_INFO: [
+                Case.Status.WAITING_INFO,
+                Case.Status.IN_PROGRESS,
+            ],
+            Case.Status.REOPENED: [
+                Case.Status.IN_PROGRESS,
+                Case.Status.WAITING_INFO,
+            ],
+        }
+
+        available = allowed_statuses.get(case.status, [])
+        labels = dict(Case.Status.choices)
+
+        self.fields["status"].choices = [
+            (status, labels[status])
+            for status in available
+        ]
+
+        self.can_update = bool(available)
+
+        if case.status in available:
+            self.fields["status"].initial = case.status
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if not self.can_update:
+            raise forms.ValidationError(
+                "Progress cannot be updated in this case's current status."
+            )
+
+        return cleaned_data

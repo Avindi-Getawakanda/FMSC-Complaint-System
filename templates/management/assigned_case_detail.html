@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    {{ case.case_number }} | FMSC Feedback Portal
+{% endblock %}
+
+{% block page_label %}Assigned Case Details{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/management.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+
+    <div class="page-heading">
+        <a
+            href="{% url 'management:assigned_case_list' %}"
+            class="back-link"
+        >
+            &larr; Back to assigned cases
+        </a>
+    </div>
+
+    <article class="case-panel">
+
+        <div class="case-heading">
+            <div>
+                <p class="case-number">
+                    {{ case.case_number }}
+                </p>
+
+                <h1>{{ case.title }}</h1>
+            </div>
+
+            <span class="status-badge status-{{ case.status }}">
+                {{ case.get_status_display }}
+            </span>
+        </div>
+
+        <dl class="case-meta">
+
+            <div>
+                <dt>Case Type</dt>
+                <dd>{{ case.get_case_type_display }}</dd>
+            </div>
+
+            <div>
+                <dt>Category</dt>
+                <dd>{{ case.category.name }}</dd>
+            </div>
+
+            <div>
+                <dt>Priority</dt>
+                <dd>
+                    <span
+                        {% if case.priority == "urgent" %}
+                            class="priority-urgent"
+                        {% endif %}
+                    >
+                        {{ case.get_priority_display }}
+                    </span>
+                </dd>
+            </div>
+
+            <div>
+                <dt>Location</dt>
+                <dd>{{ case.location|default:"Not specified" }}</dd>
+            </div>
+
+            <div>
+                <dt>Assigned Authority</dt>
+                <dd>{{ case.assigned_authority.name }}</dd>
+            </div>
+
+            <div>
+                <dt>Submitted On</dt>
+                <dd>{{ case.created_at|date:"d M Y, h:i A" }}</dd>
+            </div>
+
+            <div>
+                <dt>Last Updated</dt>
+                <dd>{{ case.updated_at|date:"d M Y, h:i A" }}</dd>
+            </div>
+
+        </dl>
+
+        <section class="case-section">
+            <h2>Description</h2>
+
+            <div class="case-description">
+                {{ case.description|linebreaks }}
+            </div>
+        </section>
+
+        {% if case.resolution_note %}
+            <section class="case-section">
+                <h2>Resolution Details</h2>
+
+                <div class="case-description">
+                    {{ case.resolution_note|linebreaks }}
+                </div>
+            </section>
+        {% endif %}
+
+        <section class="case-section">
+            <h2>Progress History</h2>
+
+            {% for update in progress_updates %}
+                <div class="case-section">
+                    <span class="status-badge status-{{ update.status }}">
+                        {{ update.get_status_display }}
+                    </span>
+
+                    <p class="form-help">
+                        {{ update.created_at|date:"d M Y, h:i A" }}
+                        &middot;
+                        {{ update.updated_by.username|default:"Deleted account" }}
+                    </p>
+
+                    <div class="case-description">
+                        {{ update.comment|linebreaks }}
+                    </div>
+                </div>
+            {% empty %}
+                <p class="form-introduction">
+                    No progress updates have been recorded yet.
+                </p>
+            {% endfor %}
+        </section>
+                
+        {% if case.status == "assigned" or case.status == "not_started" or case.status == "in_progress" or case.status == "waiting_info" or case.status == "reopened" %}
+            <div class="case-actions">
+                <a
+                    href="{% url 'management:case_progress_update' case.pk %}"
+                    class="management-button"
+                >
+                    Update Progress
+                </a>
+            </div>
+        {% endif %}
+
+    </article>
+
+{% endblock %}

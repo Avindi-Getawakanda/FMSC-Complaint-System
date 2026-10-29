@@ -8,12 +8,13 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from cases.models import AuditLog, Case
 from .forms import CaseAssignmentForm , CaseRejectionForm
-from .models import Authority
 from .forms import (
     AuthorityForm,
     CaseAssignmentForm,
     CaseRejectionForm,
+    ProgressUpdateForm,
 )
+from .models import Authority, ProgressUpdate
 
 
 @role_required(
@@ -293,4 +294,82 @@ def assigned_case_list(request):
             "authority": authority,
             "cases": cases,
         },
+    )
+
+@role_required(UserProfile.Role.AUTHORITY)
+def assigned_case_detail(request, pk):
+    case = get_object_or_404(
+        Case.objects.select_related(
+            "category",
+            "submitted_by",
+            "assigned_authority",
+        ),
+        pk=pk,
+        assigned_authority__user=request.user,
+        assigned_authority__is_active=True,
+    )
+
+    progress_updates = case.progress_updates.select_related(
+        "updated_by"
+    ).order_by("created_at")
+
+    return render(
+        request,
+        "management/assigned_case_detail.html",
+        {
+            "case": case,
+            "progress_updates": progress_updates,
+        },
+    )
+@role_required(UserProfile.Role.AUTHORITY)
+@transaction.atomic
+def case_progress_update(request, pk):
+    case = get_object_or_404(
+        Case.objects.select_for_update(),
+        pk=pk,
+        assigned_authority__user=request.user,
+        assigned_authority__is_active=True,
+    )
+
+    if request.method == "POST":
+        form = ProgressUpdateForm(request.POST, case=case)
+
+        if form.is_valid():
+            old_status = case.status
+            new_status = form.cleaned_data["status"]
+
+            ProgressUpdate.objects.create(
+                case=case,
+                comment=form.cleaned_data["comment"],
+                status=new_status,
+                updated_by=request.user,
+            )
+
+            case.status = new_status
+            case.save(update_fields=["status", "updated_at"])
+
+            AuditLog.objects.create(
+                case=case,
+                actor=request.user,
+                action="Case progress updated",
+                old_value=json.dumps({"status": old_status}),
+                new_value=json.dumps({"status": new_status}),
+            )
+
+            messages.success(
+                request,
+                "Progress update saved successfully.",
+            )
+
+            return redirect(
+                "management:assigned_case_detail",
+                pk=case.pk,
+            )
+    else:
+        form = ProgressUpdateForm(case=case)
+
+    return render(
+        request,
+        "management/case_progress_form.html",
+        {"case": case, "form": form},
     )
