@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Close Case | FMSC Feedback Portal{% endblock %}
+
+{% block page_label %}Review and Close Case{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/management.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+
+    <div class="management-form-panel">
+
+        <a
+            href="{% url 'management:case_detail' case.pk %}"
+            class="back-link"
+        >
+            &larr; Back to case details
+        </a>
+
+        <section class="case-panel">
+
+            <div class="case-heading">
+                <div>
+                    <p class="case-number">
+                        {{ case.case_number }}
+                    </p>
+
+                    <h1>Review and Close Case</h1>
+                </div>
+
+                <span class="status-badge status-{{ case.status }}">
+                    {{ case.get_status_display }}
+                </span>
+            </div>
+
+            <div class="case-summary">
+                <p><strong>Case:</strong> {{ case.title }}</p>
+                <p>
+                    <strong>Authority:</strong>
+                    {{ case.assigned_authority.name|default:"Unassigned" }}
+                </p>
+            </div>
+
+            <section class="case-section">
+                <h2>Resolution Details</h2>
+
+                <div class="case-description">
+                    {{ case.resolution_note|default:"No resolution recorded."|linebreaks }}
+                </div>
+
+                {% if case.solved_at %}
+                    <p class="form-help">
+                        Solved on
+                        {{ case.solved_at|date:"d M Y, h:i A" }}
+                    </p>
+                {% endif %}
+
+                {% if case.closed_at %}
+                    <p class="form-help">
+                        Closed on
+                        {{ case.closed_at|date:"d M Y, h:i A" }}
+                    </p>
+                {% endif %}
+            </section>
+
+            <section class="case-section">
+                <h2>Progress and Evidence</h2>
+
+                {% for update in progress_updates %}
+                    <div class="case-section">
+
+                        <span class="status-badge status-{{ update.status }}">
+                            {{ update.get_status_display }}
+                        </span>
+
+                        <p class="form-help">
+                            {{ update.created_at|date:"d M Y, h:i A" }}
+                            &middot;
+                            {{ update.updated_by.username|default:"Deleted account" }}
+                        </p>
+
+                        <div class="case-description">
+                            {{ update.comment|linebreaks }}
+                        </div>
+
+                        {% if update.evidence %}
+                            <a
+                                href="{% url 'management:progress_evidence_download' update.pk %}"
+                                class="case-title-link"
+                            >
+                                Download supporting evidence
+                            </a>
+                        {% endif %}
+
+                    </div>
+                {% empty %}
+                    <p class="form-introduction">
+                        No progress updates have been recorded.
+                    </p>
+                {% endfor %}
+            </section>
+
+            <form method="post" class="management-form">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="form-error-summary" role="alert">
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if can_close %}
+
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            {{ form.confirm }}
+
+                            <label for="{{ form.confirm.id_for_label }}">
+                                {{ form.confirm.label }}
+                            </label>
+                        </div>
+
+                        {% for error in form.confirm.errors %}
+                            <p class="form-error" role="alert">
+                                {{ error }}
+                            </p>
+                        {% endfor %}
+                    </div>
+
+                    <div class="case-actions">
+                        <button
+                            type="submit"
+                            class="management-button"
+                        >
+                            Confirm Closure
+                        </button>
+
+                        <a
+                            href="{% url 'management:case_detail' case.pk %}"
+                            class="management-button management-button-outline"
+                        >
+                            Cancel
+                        </a>
+                    </div>
+
+                {% else %}
+                    <p class="form-introduction">
+                        Only a solved case can be closed.
+                    </p>
+                {% endif %}
+
+            </form>
+
+        </section>
+
+    </div>
+
+{% endblock %}

@@ -300,3 +300,12 @@ class CaseResolutionForm(forms.Form):
             "required": "Please explain how the case was resolved.",
         },
     )
+
+class CaseClosureForm(forms.Form):
+    confirm = forms.BooleanField(
+        label="I have reviewed the resolution and approve closing this case.",
+        required=True,
+        error_messages={
+            "required": "Please confirm that you reviewed the resolution.",
+        },
+    )
