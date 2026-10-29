@@ -185,6 +185,26 @@
         {% endif %}
         
 
+
+        <section class="case-section">
+            <h2>Submitted Attachments</h2>
+            <ul>
+                {% for attachment in case.attachments.all %}
+                    <li>
+                        <a class="case-title-link"
+                           href="{% url 'management:submission_attachment_download' attachment.pk %}">
+                            Download attachment {{ forloop.counter }}
+                        </a>
+                        <span class="form-help">
+                            — {{ attachment.uploaded_at|date:"d M Y, h:i A" }}
+                        </span>
+                    </li>
+                {% empty %}
+                    <li>No attachments were submitted.</li>
+                {% endfor %}
+            </ul>
+        </section>
+
     </article>
 
 {% endblock %}

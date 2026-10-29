@@ -27,6 +27,16 @@
         </p>
     </div>
 
+    <section class="case-panel report-filter-panel">
+        <form method="get" class="management-form">
+            <div class="form-group"><label for="case-search">Case number or title</label>
+                <input id="case-search" type="search" name="q" value="{{ query }}" maxlength="200">
+            </div>
+            <div class="case-actions"><button class="management-button" type="submit">Search</button>
+            <a class="management-button management-button-outline" href="{% url 'management:case_list' %}">Reset</a></div>
+        </form>
+    </section>
+    <p class="report-results-heading">{{ page_obj.paginator.count }} matching case{{ page_obj.paginator.count|pluralize }}.</p>
     <section class="case-list-panel" aria-label="Submitted cases">
         <div
             class="table-scroll"
@@ -100,7 +110,7 @@
                     {% empty %}
                         <tr>
                             <td colspan="7" class="empty-state">
-                                No cases have been submitted yet.
+                                No cases match your search.
                             </td>
                         </tr>
                     {% endfor %}
@@ -109,4 +119,9 @@
         </div>
     </section>
 
+{% if page_obj.has_other_pages %}<nav class="report-pagination" aria-label="Case pages">
+{% if page_obj.has_previous %}<a href="?q={{ query|urlencode }}&amp;page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}
+<span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+{% if page_obj.has_next %}<a href="?q={{ query|urlencode }}&amp;page={{ page_obj.next_page_number }}">Next</a>{% endif %}
+</nav>{% endif %}
 {% endblock %}

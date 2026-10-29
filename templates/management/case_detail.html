@@ -17,10 +17,7 @@
 {% block content %}
 
     <div class="page-heading">
-        <a
-            href="{% url 'management:case_list' %}"
-            class="back-link"
-        >
+        <a href="{% url 'management:case_list' %}" class="back-link">
             &larr; Back to cases
         </a>
     </div>
@@ -29,10 +26,7 @@
 
         <div class="case-heading">
             <div>
-                <p class="case-number">
-                    {{ case.case_number }}
-                </p>
-
+                <p class="case-number">{{ case.case_number }}</p>
                 <h1>{{ case.title }}</h1>
             </div>
 
@@ -42,7 +36,6 @@
         </div>
 
         <dl class="case-meta">
-
             <div>
                 <dt>Case Type</dt>
                 <dd>{{ case.get_case_type_display }}</dd>
@@ -73,9 +66,7 @@
 
             <div>
                 <dt>Location</dt>
-                <dd>
-                    {{ case.location|default:"Not specified" }}
-                </dd>
+                <dd>{{ case.location|default:"Not specified" }}</dd>
             </div>
 
             <div>
@@ -85,27 +76,19 @@
 
             <div>
                 <dt>Submitted On</dt>
-                <dd>
-                    {{ case.created_at|date:"d M Y, h:i A" }}
-                </dd>
+                <dd>{{ case.created_at|date:"d M Y, h:i A" }}</dd>
             </div>
 
             <div>
                 <dt>Assigned Authority</dt>
                 <dd>
-                    {% if case.assigned_authority %}
-                        {{ case.assigned_authority.name }}
-                    {% else %}
-                        Unassigned
-                    {% endif %}
+                    {{ case.assigned_authority.name|default:"Unassigned" }}
                 </dd>
             </div>
-
         </dl>
 
         <section class="case-section">
             <h2>Description</h2>
-
             <div class="case-description">
                 {{ case.description|linebreaks }}
             </div>
@@ -114,52 +97,11 @@
         {% if case.status == "rejected" %}
             <section class="rejection-note">
                 <h2>Reason for Rejection</h2>
-
                 {{ case.rejection_reason|default:"No reason recorded."|linebreaks }}
             </section>
         {% endif %}
 
-        {% if user.is_superuser or user.profile.role == "administrator" or user.profile.role == "system_admin" %}
-
-            {% if case.status == "submitted" or case.status == "under_review" or case.status == "not_started" or case.status == "assigned" or case.status == "reopened" %}
-
-                <div class="case-actions">
-
-                    <a
-                        href="{% url 'management:case_assign' case.pk %}"
-                        class="management-button"
-                    >
-                        Review and Assign
-                    </a>
-
-                    <a
-                        href="{% url 'management:case_reject' case.pk %}"
-                        class="management-button management-button-outline"
-                    >
-                        Reject Case
-                    </a>
-
-                </div>
-
-            {% endif %}
-
-        {% endif %}
-
-                {% if user.is_superuser or user.profile.role == "administrator" or user.profile.role == "system_admin" %}
-            {% if case.status == "solved" %}
-                <div class="case-actions">
-                    <a
-                        href="{% url 'management:case_close' case.pk %}"
-                        class="management-button"
-                    >
-                        Review and Close Case
-                    </a>
-                </div>
-            {% endif %}
-        {% endif %}
-    
-
-                {% if case.resolution_note %}
+        {% if case.resolution_note %}
             <section class="case-section">
                 <h2>Resolution Details</h2>
 
@@ -179,7 +121,6 @@
         {% if case.closed_at %}
             <section class="case-section">
                 <h2>Closure Details</h2>
-
                 <p>
                     Closed on
                     {{ case.closed_at|date:"d M Y, h:i A" }}
@@ -187,7 +128,81 @@
             </section>
         {% endif %}
 
-                <section class="case-section">
+        {% if user.is_superuser or user.profile.role == "administrator" or user.profile.role == "system_admin" %}
+
+            {% if case.status == "submitted" %}
+                <div class="case-actions">
+                    <form
+                        method="post"
+                        action="{% url 'management:case_mark_under_review' case.pk %}"
+                    >
+                        {% csrf_token %}
+                        <button type="submit" class="management-button">
+                            Mark Under Review
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+
+            {% if case.status == "submitted" or case.status == "under_review" or case.status == "not_started" or case.status == "assigned" or case.status == "reopened" %}
+                <div class="case-actions">
+
+                    {% if not case.assigned_authority_id %}
+                        <a
+                            href="{% url 'management:case_assign' case.pk %}"
+                            class="management-button"
+                        >
+                            Review and Assign
+                        </a>
+                    {% endif %}
+
+                    <a
+                        href="{% url 'management:case_reject' case.pk %}"
+                        class="management-button management-button-outline"
+                    >
+                        Reject Case
+                    </a>
+                </div>
+            {% endif %}
+
+            {% if case.assigned_authority_id %}
+                {% if case.status == "assigned" or case.status == "not_started" or case.status == "in_progress" or case.status == "waiting_info" or case.status == "reopened" %}
+                    <div class="case-actions">
+                        <a
+                            href="{% url 'management:case_reassign' case.pk %}"
+                            class="management-button"
+                        >
+                            Reassign Case
+                        </a>
+                    </div>
+                {% endif %}
+            {% endif %}
+
+            {% if case.status == "solved" %}
+                <div class="case-actions">
+                    <a
+                        href="{% url 'management:case_close' case.pk %}"
+                        class="management-button"
+                    >
+                        Review and Close Case
+                    </a>
+                </div>
+            {% endif %}
+
+            {% if case.status == "solved" or case.status == "closed" %}
+                <div class="case-actions">
+                    <a
+                        href="{% url 'management:case_reopen' case.pk %}"
+                        class="management-button management-button-outline"
+                    >
+                        Reopen Case
+                    </a>
+                </div>
+            {% endif %}
+
+        {% endif %}
+
+        <section class="case-section">
             <h2>Progress History</h2>
 
             {% for update in progress_updates %}
@@ -271,6 +286,26 @@
                     </tbody>
                 </table>
             </div>
+        </section>
+
+
+        <section class="case-section">
+            <h2>Submitted Attachments</h2>
+            <ul>
+                {% for attachment in case.attachments.all %}
+                    <li>
+                        <a class="case-title-link"
+                           href="{% url 'management:submission_attachment_download' attachment.pk %}">
+                            Download attachment {{ forloop.counter }}
+                        </a>
+                        <span class="form-help">
+                            — {{ attachment.uploaded_at|date:"d M Y, h:i A" }}
+                        </span>
+                    </li>
+                {% empty %}
+                    <li>No attachments were submitted.</li>
+                {% endfor %}
+            </ul>
         </section>
 
     </article>

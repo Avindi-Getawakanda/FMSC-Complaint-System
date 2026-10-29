@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Reopen Case | FMSC Feedback Portal{% endblock %}
+
+{% block page_label %}Reopen Case{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/management.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+
+    <div class="management-form-panel">
+
+        <a
+            href="{% url 'management:case_detail' case.pk %}"
+            class="back-link"
+        >
+            &larr; Back to case details
+        </a>
+
+        <section class="case-panel">
+
+            <div class="case-heading">
+                <div>
+                    <p class="case-number">
+                        {{ case.case_number }}
+                    </p>
+                    <h1>Reopen Case</h1>
+                </div>
+            </div>
+
+            <div class="case-summary">
+                <p><strong>Case:</strong> {{ case.title }}</p>
+                <p>
+                    <strong>Current status:</strong>
+                    {{ case.get_status_display }}
+                </p>
+                <p>
+                    <strong>Authority:</strong>
+                    {{ case.assigned_authority.name|default:"Unassigned" }}
+                </p>
+            </div>
+
+            {% if case.resolution_note %}
+                <section class="case-section">
+                    <h2>Previous Resolution</h2>
+                    <div class="case-description">
+                        {{ case.resolution_note|linebreaks }}
+                    </div>
+                </section>
+            {% endif %}
+
+            <form method="post" class="management-form">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="form-error-summary" role="alert">
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if can_reopen %}
+
+                    <p class="form-introduction">
+                        Explain why further work is needed.
+                        The case will return to Reopened status.
+                        Previous progress and audit records will
+                        remain available.
+                    </p>
+
+                    {% for field in form %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">
+                                {{ field.label }} *
+                            </label>
+
+                            {{ field }}
+
+                            {% for error in field.errors %}
+                                <p class="form-error" role="alert">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+
+                    <div class="case-actions">
+                        <button type="submit" class="management-button">
+                            Confirm Reopening
+                        </button>
+
+                        <a
+                            href="{% url 'management:case_detail' case.pk %}"
+                            class="management-button management-button-outline"
+                        >
+                            Cancel
+                        </a>
+                    </div>
+
+                {% else %}
+
+                    <p class="form-introduction">
+                        Only solved or closed cases can be reopened.
+                    </p>
+
+                {% endif %}
+            </form>
+
+        </section>
+    </div>
+
+{% endblock %}

@@ -42,10 +42,20 @@ def case_list(request):
         "assigned_authority",
     ).order_by("-created_at")
 
+    query = request.GET.get("q", "").strip()[:200]
+    if query:
+        cases = cases.filter(
+            Q(case_number__icontains=query) | Q(title__icontains=query)
+        )
+
+    page_obj = Paginator(
+        cases.order_by("-created_at", "-pk"), 25
+    ).get_page(request.GET.get("page"))
+
     return render(
         request,
         "management/case_list.html",
-        {"cases": cases},
+        {"cases": page_obj, "page_obj": page_obj, "query": query},
     )
 
 @role_required(
@@ -711,6 +721,15 @@ def case_report(request):
 
     if filters_valid:
         filters = form.cleaned_data
+
+        if filters["q"]:
+            cases = cases.filter(
+                Q(case_number__icontains=filters["q"])
+                | Q(title__icontains=filters["q"])
+            )
+
+        if filters["priority"]:
+            cases = cases.filter(priority=filters["priority"])
 
         if filters["status"]:
             cases = cases.filter(status=filters["status"])

@@ -9,6 +9,7 @@ from django.db.models import (
 )
 from django.db.models.functions import Coalesce
 from django.shortcuts import render
+from django.utils import timezone
 
 from accounts.decorators import role_required
 from accounts.models import UserProfile
@@ -298,6 +299,25 @@ def management_dashboard(request):
         )
         .order_by("-total", "assigned_authority__name")
     )
+
+    # Calendar-day ages match the ageing report and configured local timezone.
+    # Reuse the existing SQL workload counts; add only the pending-age summary.
+    today = timezone.localdate()
+    ages_by_authority = {}
+    for authority_id, created_at in (
+        cases.filter(status__in=pending_statuses)
+        .order_by()
+        .values_list("assigned_authority_id", "created_at")
+        .iterator(chunk_size=500)
+    ):
+        total_age, count = ages_by_authority.get(authority_id, (0, 0))
+        age = max((today - timezone.localtime(created_at).date()).days, 0)
+        ages_by_authority[authority_id] = (total_age + age, count + 1)
+
+    authority_summary = list(authority_summary)
+    for row in authority_summary:
+        total_age, count = ages_by_authority[row["assigned_authority_id"]]
+        row["average_age"] = total_age / count
 
     category_summary = (
         cases.order_by()
