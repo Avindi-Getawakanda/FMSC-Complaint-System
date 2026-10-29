@@ -43,4 +43,10 @@ urlpatterns = [
         views.case_progress_update,
         name="case_progress_update",
     ),
+
+        path(
+        "progress/<int:pk>/evidence/",
+        views.progress_evidence_download,
+        name="progress_evidence_download",
+    ),
 ]

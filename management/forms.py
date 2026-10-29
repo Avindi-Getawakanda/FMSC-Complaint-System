@@ -6,6 +6,7 @@ from accounts.models import UserProfile
 from cases.models import Case, Category
 
 from .models import Authority
+from django.core.validators import FileExtensionValidator
 
 
 class CaseAssignmentForm(forms.ModelForm):
@@ -204,6 +205,20 @@ class ProgressUpdateForm(forms.Form):
         ),
     )
 
+    evidence = forms.FileField(
+        label="Supporting evidence",
+        required=False,
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=["jpg", "jpeg", "png", "pdf"]
+            )
+        ],
+        help_text="Optional. Upload a JPG, PNG or PDF, up to 5 MB.",
+        widget=forms.ClearableFileInput(
+            attrs={"accept": ".jpg,.jpeg,.png,.pdf"}
+        ),
+    )
+
     def __init__(self, *args, case, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -244,6 +259,19 @@ class ProgressUpdateForm(forms.Form):
 
         if case.status in available:
             self.fields["status"].initial = case.status
+
+    def clean_evidence(self):
+        evidence = self.cleaned_data.get("evidence")
+
+        if not evidence:
+            return evidence
+
+        if evidence.size > 5 * 1024 * 1024:
+            raise forms.ValidationError(
+                "The file must be 5 MB or smaller."
+            )
+
+        return evidence
 
     def clean(self):
         cleaned_data = super().clean()
