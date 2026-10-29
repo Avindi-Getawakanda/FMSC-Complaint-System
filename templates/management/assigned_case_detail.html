@@ -67,8 +67,15 @@
             </div>
 
             <div>
+                <dt>Status</dt>
+                <dd>{{ case.get_status_display }}</dd>
+            </div>
+
+            <div>
                 <dt>Location</dt>
-                <dd>{{ case.location|default:"Not specified" }}</dd>
+                <dd>
+                    {{ case.location|default:"Not specified" }}
+                </dd>
             </div>
 
             <div>
@@ -78,12 +85,16 @@
 
             <div>
                 <dt>Submitted On</dt>
-                <dd>{{ case.created_at|date:"d M Y, h:i A" }}</dd>
+                <dd>
+                    {{ case.created_at|date:"d M Y, h:i A" }}
+                </dd>
             </div>
 
             <div>
                 <dt>Last Updated</dt>
-                <dd>{{ case.updated_at|date:"d M Y, h:i A" }}</dd>
+                <dd>
+                    {{ case.updated_at|date:"d M Y, h:i A" }}
+                </dd>
             </div>
 
         </dl>
@@ -103,6 +114,13 @@
                 <div class="case-description">
                     {{ case.resolution_note|linebreaks }}
                 </div>
+
+                {% if case.solved_at %}
+                    <p class="form-help">
+                        Solved on
+                        {{ case.solved_at|date:"d M Y, h:i A" }}
+                    </p>
+                {% endif %}
             </section>
         {% endif %}
 
@@ -111,6 +129,7 @@
 
             {% for update in progress_updates %}
                 <div class="case-section">
+
                     <span class="status-badge status-{{ update.status }}">
                         {{ update.get_status_display }}
                     </span>
@@ -124,6 +143,7 @@
                     <div class="case-description">
                         {{ update.comment|linebreaks }}
                     </div>
+
                     {% if update.evidence %}
                         <a
                             href="{% url 'management:progress_evidence_download' update.pk %}"
@@ -132,22 +152,35 @@
                             Download supporting evidence
                         </a>
                     {% endif %}
+
                 </div>
             {% empty %}
                 <p class="form-introduction">
                     No progress updates have been recorded yet.
                 </p>
             {% endfor %}
+
         </section>
-                
+
         {% if case.status == "assigned" or case.status == "not_started" or case.status == "in_progress" or case.status == "waiting_info" or case.status == "reopened" %}
             <div class="case-actions">
+
                 <a
                     href="{% url 'management:case_progress_update' case.pk %}"
                     class="management-button"
                 >
                     Update Progress
                 </a>
+
+                {% if case.status == "in_progress" or case.status == "waiting_info" %}
+                    <a
+                        href="{% url 'management:case_resolve' case.pk %}"
+                        class="management-button management-button-outline"
+                    >
+                        Mark as Solved
+                    </a>
+                {% endif %}
+
             </div>
         {% endif %}
 

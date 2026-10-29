@@ -282,3 +282,21 @@ class ProgressUpdateForm(forms.Form):
             )
 
         return cleaned_data
+class CaseResolutionForm(forms.Form):
+    resolution_note = forms.CharField(
+        label="Resolution details",
+        required=True,
+        strip=True,
+        widget=forms.Textarea(
+            attrs={
+                "rows": 5,
+                "placeholder": (
+                    "Explain what was done to resolve the case "
+                    "and how the result was checked."
+                ),
+            }
+        ),
+        error_messages={
+            "required": "Please explain how the case was resolved.",
+        },
+    )
