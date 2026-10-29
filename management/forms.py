@@ -291,6 +291,17 @@ class CaseClosureForm(forms.Form):
 
 
 class CaseReportFilterForm(forms.Form):
+    q = forms.CharField(
+        label="Case number or title",
+        required=False,
+        max_length=200,
+    )
+
+    priority = forms.ChoiceField(
+        required=False,
+        choices=[("", "All priorities")] + list(Case.Priority.choices),
+    )
+
     status = forms.ChoiceField(
         required=False,
         choices=[

@@ -2,6 +2,7 @@ from django.urls import path
 
 from . import (
     ageing_views,
+    attachment_views,
     dashboard_views,
     views,
     workflow_views,
@@ -10,6 +11,11 @@ from . import (
 app_name = "management"
 
 urlpatterns = [
+    path(
+        "attachments/<int:pk>/download/",
+        attachment_views.submission_attachment_download,
+        name="submission_attachment_download",
+    ),
     path("cases/", views.case_list, name="case_list"),
     path("cases/<int:pk>/", views.case_detail, name="case_detail"),
 

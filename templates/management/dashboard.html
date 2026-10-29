@@ -186,6 +186,7 @@
                             <th scope="col">Not Started</th>
                             <th scope="col">In Progress</th>
                             <th scope="col">Waiting for Information</th>
+                            <th scope="col">Average Age (Days)</th>
                         </tr>
                     </thead>
 
@@ -200,10 +201,11 @@
                                 <td>{{ item.not_started }}</td>
                                 <td>{{ item.in_progress }}</td>
                                 <td>{{ item.waiting_info }}</td>
+                                <td>{{ item.average_age|floatformat:1 }}</td>
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="6" class="empty-state">
+                                <td colspan="7" class="empty-state">
                                     No cases are pending action
                                     within the selected submission period.
                                 </td>
@@ -216,7 +218,8 @@
 
         <p class="form-help">
             Total Pending also includes Submitted, Under Review
-            and Reopened cases where applicable.
+            and Reopened cases where applicable. Average age is calendar
+            days since submission across pending cases in each row.
         </p>
 
         <section class="case-list-panel dashboard-table-section">
