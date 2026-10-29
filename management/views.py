@@ -23,6 +23,7 @@ from pathlib import Path
 from django.http import FileResponse, Http404
 from django.utils import timezone
 
+from django.db.models import Count, Q
 
 @role_required(
     UserProfile.Role.ADMINISTRATOR,
@@ -594,5 +595,86 @@ def case_close(request, pk):
             "form": form,
             "can_close": can_close,
             "progress_updates": progress_updates,
+        },
+    )
+
+@role_required(
+    UserProfile.Role.ADMINISTRATOR,
+    UserProfile.Role.SYSTEM_ADMIN,
+    UserProfile.Role.MANAGEMENT,
+)
+def management_dashboard(request):
+    cases = Case.objects.all()
+
+    # Open cases are those still awaiting completion.
+    open_statuses = [
+        Case.Status.SUBMITTED,
+        Case.Status.UNDER_REVIEW,
+        Case.Status.NOT_STARTED,
+        Case.Status.ASSIGNED,
+        Case.Status.IN_PROGRESS,
+        Case.Status.WAITING_INFO,
+        Case.Status.REOPENED,
+    ]
+
+    stats = cases.aggregate(
+        total=Count("pk"),
+        open=Count(
+            "pk",
+            filter=Q(status__in=open_statuses),
+        ),
+        in_progress=Count(
+            "pk",
+            filter=Q(status=Case.Status.IN_PROGRESS),
+        ),
+        solved=Count(
+            "pk",
+            filter=Q(status=Case.Status.SOLVED),
+        ),
+        closed=Count(
+            "pk",
+            filter=Q(status=Case.Status.CLOSED),
+        ),
+        rejected=Count(
+            "pk",
+            filter=Q(status=Case.Status.REJECTED),
+        ),
+        urgent_open=Count(
+            "pk",
+            filter=Q(
+                priority=Case.Priority.URGENT,
+                status__in=open_statuses,
+            ),
+        ),
+    )
+
+    counts_by_status = dict(
+        cases.order_by()
+        .values("status")
+        .annotate(total=Count("pk"))
+        .values_list("status", "total")
+    )
+
+    status_summary = [
+        {
+            "value": value,
+            "label": label,
+            "total": counts_by_status.get(value, 0),
+        }
+        for value, label in Case.Status.choices
+    ]
+
+    recent_cases = cases.select_related(
+        "category",
+        "assigned_authority",
+    ).order_by("-created_at")[:5]
+
+    return render(
+        request,
+        "management/dashboard.html",
+        {
+            "stats": stats,
+            "status_summary": status_summary,
+            "recent_cases": recent_cases,
         },
     )
