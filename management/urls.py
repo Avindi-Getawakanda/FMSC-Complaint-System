@@ -67,4 +67,9 @@ urlpatterns = [
         views.management_dashboard,
         name="dashboard",
     ),
+        path(
+        "reports/",
+        views.case_report,
+        name="case_report",
+    ),
 ]
