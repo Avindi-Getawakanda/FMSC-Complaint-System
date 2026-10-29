@@ -54,6 +54,30 @@
 
         <div class="feature-grid">
 
+            {% if request.user.is_superuser or profile.role == "administrator" or profile.role == "system_admin" or profile.role == "management" %}
+
+                <article class="feature-card">
+                    <div class="feature-icon slate" aria-hidden="true">
+                        &#9636;
+                    </div>
+
+                    <h3>Management Overview</h3>
+
+                    <p>
+                        View live case statistics, status summaries
+                        and recent submissions.
+                    </p>
+
+                    <a
+                        href="{% url 'management:dashboard' %}"
+                        class="primary-button"
+                    >
+                        View Overview
+                    </a>
+                </article>
+
+            {% endif %}
+
             {% if request.user.is_superuser or profile.role == "administrator" or profile.role == "system_admin" %}
 
                 <article class="feature-card">
@@ -152,14 +176,17 @@
                         their progress.
                     </p>
 
-                    <a href="{% url 'my_cases' %}" class="primary-button">
+                    <a
+                        href="{% url 'my_cases' %}"
+                        class="primary-button"
+                    >
                         View My Cases
                     </a>
                 </article>
 
             {% elif profile.role == "authority" %}
 
-                                <article class="feature-card">
+                <article class="feature-card">
                     <div class="feature-icon" aria-hidden="true">
                         &#9776;
                     </div>
@@ -167,8 +194,8 @@
                     <h3>Assigned Cases</h3>
 
                     <p>
-                        View cases assigned to your authority
-                        and follow their current status.
+                        View cases assigned to your authority,
+                        record progress and resolve issues.
                     </p>
 
                     <a
@@ -193,10 +220,12 @@
                     information relevant to your account.
                 </p>
 
-                <a href="{% url 'notifications:list' %}" class="primary-button">
+                <a
+                    href="{% url 'notifications:list' %}"
+                    class="primary-button"
+                >
                     View Notifications
                 </a>
-
             </article>
 
         </div>

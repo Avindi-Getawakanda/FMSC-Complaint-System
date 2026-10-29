@@ -61,4 +61,10 @@ urlpatterns = [
         views.case_close,
         name="case_close",
     ),
+
+        path(
+        "dashboard/",
+        views.management_dashboard,
+        name="dashboard",
+    ),
 ]
